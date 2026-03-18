@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নিউজ পোর্টাল - সর্বশেষ খবর</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Bar with Date and Social -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="current-date" id="current-date"></div>
+            <ul class="social-links">
+                <li><a href="https://web.facebook.com/mijanur.rahman.915304" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="https://youtube.com" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a></li>
+                <li><a href="https://twitter.com" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="https://instagram.com" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header with Logo and Search -->
+    <header>
+        <div class="navbar">
+            <div class="container">
+                <div class="logo">📰 নিউজ পোর্টাল</div>
+                <div class="navbar-content">
+                    <ul class="nav-links">
+                        <li><a href="index.html" class="active">প্রচ্ছদ</a></li>
+                        <li><a href="news.html">সব খবর</a></li>
+                    </ul>
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="খবর খুঁজুন...">
+                        <button id="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Category Menu -->
+    <nav class="category-menu">
+        <ul class="container">
+            <li><a href="#" onclick="filterByCategory('national')">জাতীয়</a></li>
+            <li><a href="#" onclick="filterByCategory('international')">আন্তর্জাতিক</a></li>
+            <li><a href="#" onclick="filterByCategory('politics')">রাজনীতি</a></li>
+            <li><a href="#" onclick="filterByCategory('corporate')">কর্পোরেট</a></li>
+            <li><a href="#" onclick="filterByCategory('education')">শিক্ষা</a></li>
+            <li><a href="#" onclick="filterByCategory('health')">স্বাস্থ্য</a></li>
+            <li><a href="#" onclick="filterByCategory('sports')">খেলা</a></li>
+            <li><a href="#" onclick="filterByCategory('technology')">প্রযুক্তি</a></li>
+            <li><a href="#" onclick="filterByCategory('lifestyle')">লাইফস্টাইল</a></li>
+            <li><a href="#" onclick="filterByCategory('feature')">ফিচার</a></li>
+            <li><a href="#" onclick="filterByCategory('law')">আইন</a></li>
+            <li><a href="#" onclick="filterByCategory('religion')">ধর্ম</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <!-- Featured News -->
+            <section class="featured-section">
+                <div id="featured-news"></div>
+            </section>
+
+            <!-- Main Content with Sidebar -->
+            <div class="main-wrapper">
+                <section class="news-section">
+                    <h2>সর্বশেষ খবর</h2>
+                    <div id="news-container" class="news-grid">
+                        <!-- News items will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <!-- Popular News Widget -->
+                    <div class="sidebar-widget">
+                        <div class="sidebar-title">📌 এই সপ্তাহের পাঠকপ্রিয়</div>
+                        <div class="sidebar-content">
+                            <div id="popular-news"></div>
+                        </div>
+                    </div>
+
+                    <!-- Advertisement -->
+                    <div class="ad-banner">
+                        <h3>বিশেষ অফার</h3>
+                        <p>আমাদের নিউজলেটার সাবস্ক্রাইব করুন এবং সর্বশেষ খবর পান</p>
+                        <a href="#">সাবস্ক্রাইব করুন</a>
+                    </div>
+
+                    <!-- Secondary Ad -->
+                    <div class="sidebar-widget">
+                        <div class="sidebar-title">বিজ্ঞাপন</div>
+                        <div class="sidebar-content">
+                            <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1.5rem; border-radius: 4px; text-align: center;">
+                                <p style="font-size: 0.9rem;">আপনার ব্যবসা বিজ্ঞাপন দিন</p>
+                                <a href="#" style="color: white; text-decoration: underline;">যোগাযোগ করুন</a>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 নিউজ পোর্টাল। সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Display current date
+        function displayDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('bn-BD', options);
+            document.getElementById('current-date').textContent = '📅 ' + dateStr;
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            loadNewsByCategory(category);
+        }
+
+        displayDate();
+    </script>
+</body>
+</html>

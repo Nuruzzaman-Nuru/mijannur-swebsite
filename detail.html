@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নিউজ বিবরণ - নিউজ পোর্টাল</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Bar with Date and Social -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="current-date" id="current-date"></div>
+            <ul class="social-links">
+                <li><a href="https://web.facebook.com/mijanur.rahman.915304" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="https://youtube.com" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a></li>
+                <li><a href="https://twitter.com" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="https://instagram.com" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header with Logo and Search -->
+    <header>
+        <div class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo-link">
+                    <img src="logo.svg" alt="নিউজ পোর্টাল লোগো" class="logo-img">
+                </a>
+                <div class="navbar-content">
+                    <ul class="nav-links">
+                        <li><a href="index.html">প্রচ্ছদ</a></li>
+                        <li><a href="news.html">সব খবর</a></li>
+                        <li><a href="admin.html">অ্যাডমিন</a></li>
+                    </ul>
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="খবর খুঁজুন...">
+                        <button id="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="detail-wrapper">
+                <article class="news-detail">
+                    <div id="detail-content">
+                        <!-- খবরের বিস্তারিত এখানে লোড হবে -->
+                        <p style="text-align: center; color: #666;">খবর লোড হচ্ছে...</p>
+                    </div>
+                </article>
+
+                <!-- সাইডবার -->
+                <aside class="detail-sidebar">
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">📌 সম্পর্কিত খবর</h3>
+                        <div id="related-news"></div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 নিউজ পোর্টাল। সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <script src="detail.js"></script>
+</body>
+</html>

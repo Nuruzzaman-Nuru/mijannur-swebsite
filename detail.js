@@ -1,0 +1,181 @@
+// Get news ID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const newsId = urlParams.get('id');
+
+// Load and display news detail
+async function loadNewsDetail() {
+    try {
+        // Load from JSON
+        let allNews = [];
+        const response = await fetch('news.json');
+        const data = await response.json();
+        allNews = data.news || [];
+        
+        // Load user news
+        const userNews = JSON.parse(localStorage.getItem('userNews')) || [];
+        
+        // Combine both
+        const combinedNews = [...userNews, ...allNews];
+        
+        // Find the news by ID
+        const news = combinedNews.find(item => item.id == newsId);
+        
+        if (!news) {
+            document.getElementById('detail-content').innerHTML = 
+                '<p style="color: red; text-align: center;">খবর পাওয়া যায়নি।</p>';
+            return;
+        }
+        
+        // Display news detail
+        displayNewsDetail(news);
+        
+        // Display related news
+        displayRelatedNews(combinedNews, news);
+        
+    } catch (error) {
+        console.error('Error loading news:', error);
+        document.getElementById('detail-content').innerHTML = 
+            '<p style="color: red; text-align: center;">খবর লোড করতে সমস্যা হয়েছে।</p>';
+    }
+}
+
+// Display detailed news
+function displayNewsDetail(news) {
+    const categoryMap = {
+        'national': 'জাতীয়',
+        'international': 'আন্তর্জাতিক',
+        'politics': 'রাজনীতি',
+        'corporate': 'কর্পোরেট',
+        'education': 'শিক্ষা',
+        'health': 'স্বাস্থ্য',
+        'sports': 'খেলা',
+        'technology': 'প্রযুক্তি',
+        'lifestyle': 'লাইফস্টাইল',
+        'feature': 'ফিচার',
+        'law': 'আইন',
+        'religion': 'ধর্ম'
+    };
+
+    const categoryName = categoryMap[news.category] || news.category;
+    const imageUrl = news.image || 'https://via.placeholder.com/800x400?text=No+Image';
+    const bengaliDate = new Date(news.date).toLocaleDateString('bn-BD', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    const detailHtml = `
+        <div class="detail-header">
+            <span class="detail-category">${categoryName}</span>
+            <h1 class="detail-title">${news.title}</h1>
+            
+            <div class="detail-meta">
+                <span class="detail-date">📅 ${bengaliDate}</span>
+                ${news.author ? `<span class="detail-author">✍️ ${news.author}</span>` : ''}
+                ${news.postedBy ? `<span class="detail-posted-by">👤 ${news.postedBy}</span>` : ''}
+            </div>
+        </div>
+
+        <div class="detail-image-wrapper">
+            <img src="${imageUrl}" alt="${news.title}" class="detail-image">
+        </div>
+
+        <div class="detail-body">
+            <p class="detail-description">${news.description}</p>
+        </div>
+
+        <div class="detail-footer">
+            <a href="news.html" class="back-link">← সব খবরে ফিরুন</a>
+        </div>
+    `;
+
+    document.getElementById('detail-content').innerHTML = detailHtml;
+}
+
+// Display related news (same category)
+function displayRelatedNews(allNews, currentNews) {
+    const categoryMap = {
+        'national': 'জাতীয়',
+        'international': 'আন্তর্জাতিক',
+        'politics': 'রাজনীতি',
+        'corporate': 'কর্পোরেট',
+        'education': 'শিক্ষা',
+        'health': 'স্বাস্থ্য',
+        'sports': 'খেলা',
+        'technology': 'প্রযুক্তি',
+        'lifestyle': 'লাইফস্টাইল',
+        'feature': 'ফিচার',
+        'law': 'আইন',
+        'religion': 'ধর্ম'
+    };
+
+    // Find related news (same category, excluding current)
+    const relatedNews = allNews.filter(item => 
+        item.category === currentNews.category && item.id !== currentNews.id
+    ).slice(0, 5);
+
+    const relatedContainer = document.getElementById('related-news');
+    
+    if (relatedNews.length === 0) {
+        relatedContainer.innerHTML = '<p style="color: #999;">সম্পর্কিত খবর নেই</p>';
+        return;
+    }
+
+    relatedContainer.innerHTML = relatedNews.map(item => {
+        const categoryName = categoryMap[item.category] || item.category;
+        return `
+            <div class="related-item" onclick="goToNews(${item.id})">
+                <div class="related-title">${item.title.substring(0, 35)}...</div>
+                <div class="related-category">${categoryName}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Navigate to news detail
+function goToNews(id) {
+    window.location.href = `detail.html?id=${id}`;
+}
+
+// Display current date
+function displayDate() {
+    const dateElements = document.querySelectorAll('#current-date');
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('bn-BD', options);
+    
+    dateElements.forEach(element => {
+        element.textContent = '📅 ' + dateStr;
+    });
+}
+
+// Load on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadNewsDetail();
+    displayDate();
+
+    // Search functionality
+    const searchBtn = document.getElementById('search-btn');
+    const searchInput = document.getElementById('search-input');
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value;
+            if (query.trim()) {
+                window.location.href = `news.html?search=${encodeURIComponent(query)}`;
+            }
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = searchInput.value;
+                if (query.trim()) {
+                    window.location.href = `news.html?search=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+});

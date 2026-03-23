@@ -64,7 +64,7 @@ function displayFeaturedNews(newsArray) {
     const categoryName = categoryMap[featured.category] || featured.category;
 
     featuredContainer.innerHTML = `
-        <div class="featured-news-item">
+        <div class="featured-news-item" style="cursor: pointer;" onclick="window.location.href='detail.html?id=${featured.id}'">
             <img src="${imageUrl}" alt="${featured.title}" class="featured-image">
             <div class="featured-content">
                 <span class="featured-category">${categoryName}</span>
@@ -109,6 +109,7 @@ function displayAllNews(newsArray) {
     newsArray.forEach(item => {
         const newsCard = document.createElement('div');
         newsCard.className = 'news-card';
+        newsCard.style.cursor = 'pointer';
         
         const imageUrl = item.image || 'https://via.placeholder.com/300x200?text=No+Image';
         const bengaliDate = new Date(item.date).toLocaleDateString('bn-BD', {
@@ -129,6 +130,11 @@ function displayAllNews(newsArray) {
                 ${item.author ? `<p class="news-author"><strong>লেখক:</strong> ${item.author}</p>` : ''}
             </div>
         `;
+        
+        // Add click handler to navigate to detail page
+        newsCard.addEventListener('click', () => {
+            window.location.href = `detail.html?id=${item.id}`;
+        });
         
         newsContainer.appendChild(newsCard);
     });

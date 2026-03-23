@@ -1,22 +1,31 @@
 // Global variables
 let allNews = [];
+let userNews = [];
 let currentCategory = null;
 
-// Load news from JSON file
+// Load news from JSON file and localStorage
 async function loadNews() {
     try {
+        // Load news from JSON file
         const response = await fetch('news.json');
         const data = await response.json();
         allNews = data.news;
         
+        // Load user-posted news from localStorage
+        const savedUserNews = localStorage.getItem('userNews');
+        userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        
+        // Combine both - user news first (newest)
+        const combinedNews = [...userNews, ...allNews];
+        
         // Display featured news
-        displayFeaturedNews();
+        displayFeaturedNews(combinedNews);
         
         // Display all news
-        displayAllNews(allNews);
+        displayAllNews(combinedNews);
         
         // Display popular news in sidebar
-        displayPopularNews();
+        displayPopularNews(combinedNews);
     } catch (error) {
         console.error('Error loading news:', error);
         document.getElementById('news-container').innerHTML = 
@@ -25,11 +34,11 @@ async function loadNews() {
 }
 
 // Display featured news (first item)
-function displayFeaturedNews() {
+function displayFeaturedNews(newsArray) {
     const featuredContainer = document.getElementById('featured-news');
-    if (!featuredContainer || allNews.length === 0) return;
+    if (!featuredContainer || newsArray.length === 0) return;
 
-    const featured = allNews[0];
+    const featured = newsArray[0];
     const imageUrl = featured.image || 'https://via.placeholder.com/800x400?text=Featured+News';
     const bengaliDate = new Date(featured.date).toLocaleDateString('bn-BD', {
         year: 'numeric',
@@ -37,15 +46,33 @@ function displayFeaturedNews() {
         day: 'numeric'
     });
 
+    const categoryMap = {
+        'national': 'জাতীয়',
+        'international': 'আন্তর্জাতিক',
+        'politics': 'রাজনীতি',
+        'corporate': 'কর্পোরেট',
+        'education': 'শিক্ষা',
+        'health': 'স্বাস্থ্য',
+        'sports': 'খেলা',
+        'technology': 'প্রযুক্তি',
+        'lifestyle': 'লাইফস্টাইল',
+        'feature': 'ফিচার',
+        'law': 'আইন',
+        'religion': 'ধর্ম'
+    };
+
+    const categoryName = categoryMap[featured.category] || featured.category;
+
     featuredContainer.innerHTML = `
         <div class="featured-news-item">
             <img src="${imageUrl}" alt="${featured.title}" class="featured-image">
             <div class="featured-content">
-                <span class="featured-category ${featured.categoryEn || 'technology'}">${featured.category}</span>
+                <span class="featured-category">${categoryName}</span>
                 <h2>${featured.title}</h2>
                 <p>${featured.description}</p>
                 <div class="featured-meta">
                     <span class="featured-date">📅 ${bengaliDate}</span>
+                    ${featured.author ? `<span class="featured-author">✍️ ${featured.author}</span>` : ''}
                 </div>
             </div>
         </div>
@@ -64,6 +91,21 @@ function displayAllNews(newsArray) {
 
     newsContainer.innerHTML = '';
 
+    const categoryMap = {
+        'national': 'জাতীয়',
+        'international': 'আন্তর্জাতিক',
+        'politics': 'রাজনীতি',
+        'corporate': 'কর্পোরেট',
+        'education': 'শিক্ষা',
+        'health': 'স্বাস্থ্য',
+        'sports': 'খেলা',
+        'technology': 'প্রযুক্তি',
+        'lifestyle': 'লাইফস্টাইল',
+        'feature': 'ফিচার',
+        'law': 'আইন',
+        'religion': 'ধর্ম'
+    };
+
     newsArray.forEach(item => {
         const newsCard = document.createElement('div');
         newsCard.className = 'news-card';
@@ -75,15 +117,16 @@ function displayAllNews(newsArray) {
             day: 'numeric'
         });
 
-        const categoryClass = item.categoryEn || 'technology';
+        const categoryName = categoryMap[item.category] || item.category;
         
         newsCard.innerHTML = `
             <img src="${imageUrl}" alt="${item.title}" class="news-image">
             <div class="news-content">
-                <span class="news-category ${categoryClass}">${item.category}</span>
+                <span class="news-category">${categoryName}</span>
                 <h3 class="news-title">${item.title}</h3>
-                <p class="news-description">${item.description}</p>
+                <p class="news-description">${item.description.substring(0, 100)}...</p>
                 <p class="news-date">📅 ${bengaliDate}</p>
+                ${item.author ? `<p class="news-author"><strong>লেখক:</strong> ${item.author}</p>` : ''}
             </div>
         `;
         
@@ -92,32 +135,40 @@ function displayAllNews(newsArray) {
 }
 
 // Display popular news in sidebar
-function displayPopularNews() {
+function displayPopularNews(newsArray) {
     const popularContainer = document.getElementById('popular-news');
     if (!popularContainer) return;
 
-    // Get top 5 news items as popular
-    const topNews = allNews.slice(0, 5);
-    popularContainer.innerHTML = '';
+    const categoryMap = {
+        'national': 'জাতীয়',
+        'international': 'আন্তর্জাতিক',
+        'politics': 'রাজনীতি',
+        'corporate': 'কর্পোরেট',
+        'education': 'শিক্ষা',
+        'health': 'স্বাস্থ্য',
+        'sports': 'খেলা',
+        'technology': 'প্রযুক্তি',
+        'lifestyle': 'লাইফস্টাইল',
+        'feature': 'ফিচার',
+        'law': 'আইন',
+        'religion': 'ধর্ম'
+    };
 
-    topNews.forEach((item, index) => {
-        const imageUrl = item.image || 'https://via.placeholder.com/80x80?text=News';
-        const bengaliDate = new Date(item.date).toLocaleDateString('bn-BD', {
-            day: 'numeric',
-            month: 'short'
-        });
+    // Get top 5 news
+    const topNews = newsArray.slice(0, 5);
 
-        const popularItem = document.createElement('div');
-        popularItem.className = 'popular-news-item';
-        popularItem.innerHTML = `
-            <img src="${imageUrl}" alt="${item.title}" class="popular-news-image">
-            <div class="popular-news-text">
-                <h4>${item.title}</h4>
-                <p>${bengaliDate}</p>
+    popularContainer.innerHTML = topNews.map((item, index) => {
+        const categoryName = categoryMap[item.category] || item.category;
+        return `
+            <div class="popular-item">
+                <span class="popular-number">${index + 1}</span>
+                <div class="popular-content">
+                    <p class="popular-title">${item.title.substring(0, 40)}...</p>
+                    <p class="popular-category">${categoryName}</p>
+                </div>
             </div>
         `;
-        popularContainer.appendChild(popularItem);
-    });
+    }).join('');
 }
 
 // Filter news by category
@@ -142,10 +193,9 @@ function loadNewsByCategory(category) {
 
     const bengaliCategoryName = categoryMap[category] || category;
     
-    // Filter news
-    const filteredNews = allNews.filter(news => 
-        news.categoryEn && news.categoryEn.toLowerCase() === category.toLowerCase()
-    );
+    // Combine all news and filter
+    const combinedNews = [...userNews, ...allNews];
+    const filteredNews = combinedNews.filter(news => news.category === category);
 
     // Update heading
     const newsSection = document.querySelector('.news-section h2');
@@ -160,14 +210,22 @@ function loadNewsByCategory(category) {
 // Search functionality
 function searchNews(query) {
     if (!query.trim()) {
-        displayAllNews(allNews);
+        const combinedNews = [...userNews, ...allNews];
+        displayAllNews(combinedNews);
         return;
     }
 
-    const searchResults = allNews.filter(news => 
+    const combinedNews = [...userNews, ...allNews];
+    const searchResults = combinedNews.filter(news => 
         news.title.toLowerCase().includes(query.toLowerCase()) ||
         news.description.toLowerCase().includes(query.toLowerCase())
     );
+
+    // Update heading
+    const newsSection = document.querySelector('.news-section h2');
+    if (newsSection) {
+        newsSection.textContent = `"${query}" এর সার্চ ফলাফল (${searchResults.length})`;
+    }
 
     displayAllNews(searchResults);
 }

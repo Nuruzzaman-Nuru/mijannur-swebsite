@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নিউজ পোর্টাল - অ্যাডমিন প্যানেল</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <div class="container">
+                <div class="logo">📰 নিউজ পোর্টাল</div>
+                <div class="navbar-content">
+                    <ul class="nav-links">
+                        <li><a href="index.html">প্রচ্ছদ</a></li>
+                        <li><a href="admin.html" class="active">অ্যাডমিন</a></li>
+                    </ul>
+                    <button id="logout-btn" class="btn-logout" style="display:none;">লগ আউট</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="admin-wrapper">
+                <!-- Login Section -->
+                <div id="login-section" class="admin-section">
+                    <div class="login-form">
+                        <h2>অ্যাডমিন লগইন</h2>
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="username">ইউজারনেম:</label>
+                                <input type="text" id="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">পাসওয়ার্ড:</label>
+                                <input type="password" id="password" required>
+                            </div>
+                            <button type="submit" class="btn-submit">লগইন</button>
+                        </form>
+                        <p style="margin-top: 1rem; color: #666;">
+                            <small>ডেমো: username: admin | password: 1234</small>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Admin Panel -->
+                <div id="admin-panel" class="admin-section" style="display:none;">
+                    <h2>নিউজ পোস্ট করুন</h2>
+                    
+                    <form id="news-form" class="news-form">
+                        <div class="form-group">
+                            <label for="title">খবরের শিরোনাম:</label>
+                            <input type="text" id="title" placeholder="খবরের শিরোনাম লিখুন" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">বিবরণ:</label>
+                            <textarea id="description" placeholder="বিস্তারিত বিবরণ লিখুন" rows="5" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">ক্যাটাগরি:</label>
+                            <select id="category" required>
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="national">জাতীয়</option>
+                                <option value="international">আন্তর্জাতিক</option>
+                                <option value="politics">রাজনীতি</option>
+                                <option value="corporate">কর্পোরেট</option>
+                                <option value="education">শিক্ষা</option>
+                                <option value="health">স্বাস্থ্য</option>
+                                <option value="sports">খেলা</option>
+                                <option value="technology">প্রযুক্তি</option>
+                                <option value="lifestyle">লাইফস্টাইল</option>
+                                <option value="feature">ফিচার</option>
+                                <option value="law">আইন</option>
+                                <option value="religion">ধর্ম</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image-url">ছবির লিংক (URL):</label>
+                            <input type="url" id="image-url" placeholder="https://example.com/image.jpg">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image-file">অথবা ছবি আপলোড করুন:</label>
+                            <input type="file" id="image-file" accept="image/*">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="author">লেখকের নাম:</label>
+                            <input type="text" id="author" placeholder="আপনার নাম লিখুন">
+                        </div>
+
+                        <button type="submit" class="btn-submit">নিউজ পোস্ট করুন</button>
+                    </form>
+
+                    <!-- Recent News List -->
+                    <div class="recent-news" style="margin-top: 3rem;">
+                        <h3>সম্প্রতি পোস্ট করা খবর</h3>
+                        <div id="admin-news-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 নিউজ পোর্টাল। সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <script src="admin.js"></script>
+</body>
+</html>

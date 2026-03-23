@@ -1,4 +1,4 @@
-// Admin Panel Functionality
+﻿// Admin Panel Functionality with localStorage only (for now)
 
 const loginForm = document.getElementById('login-form');
 const loginSection = document.getElementById('login-section');
@@ -6,11 +6,9 @@ const adminPanel = document.getElementById('admin-panel');
 const logoutBtn = document.getElementById('logout-btn');
 const newsForm = document.getElementById('news-form');
 
-// Simple credentials (for demo only - in production use secure backend)
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = '1234';
 
-// Check if user is already logged in
 window.addEventListener('load', () => {
     const isLoggedIn = localStorage.getItem('adminLoggedIn');
     if (isLoggedIn) {
@@ -19,10 +17,8 @@ window.addEventListener('load', () => {
     }
 });
 
-// Login Handler
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
@@ -36,7 +32,6 @@ loginForm.addEventListener('submit', (e) => {
     }
 });
 
-// Logout Handler
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminUsername');
@@ -46,14 +41,12 @@ logoutBtn.addEventListener('click', () => {
     loginForm.reset();
 });
 
-// Show Admin Panel
 function showAdminPanel() {
     loginSection.style.display = 'none';
     adminPanel.style.display = 'block';
     logoutBtn.style.display = 'block';
 }
 
-// Handle Image Upload
 let uploadedImageUrl = '';
 const imageFile = document.getElementById('image-file');
 imageFile.addEventListener('change', (e) => {
@@ -68,7 +61,6 @@ imageFile.addEventListener('change', (e) => {
     }
 });
 
-// Add News Handler
 newsForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
@@ -83,10 +75,8 @@ newsForm.addEventListener('submit', (e) => {
         return;
     }
     
-    // Get existing news
     let news = JSON.parse(localStorage.getItem('userNews')) || [];
     
-    // Create new news object
     const newNews = {
         id: Date.now(),
         title: title,
@@ -98,10 +88,7 @@ newsForm.addEventListener('submit', (e) => {
         postedBy: localStorage.getItem('adminUsername')
     };
     
-    // Add to beginning of array
     news.unshift(newNews);
-    
-    // Save to localStorage
     localStorage.setItem('userNews', JSON.stringify(news));
     
     alert('খবর সফলভাবে পোস্ট হয়েছে!');
@@ -110,33 +97,31 @@ newsForm.addEventListener('submit', (e) => {
     loadRecentNews();
 });
 
-// Load Recent News
 function loadRecentNews() {
     const news = JSON.parse(localStorage.getItem('userNews')) || [];
     const newsList = document.getElementById('admin-news-list');
     
     if (news.length === 0) {
-        newsList.innerHTML = '<p style="color: #999;">এখনও কোনো খবর পোস্ট হয়নি</p>';
+        newsList.innerHTML = '<p style=\"color: #999;\">এখনও কোনো খবর পোস্ট হয়নি</p>';
         return;
     }
     
-    newsList.innerHTML = news.map(item => `
-        <div class="admin-news-item">
-            <div class="admin-news-header">
-                <h4>${item.title}</h4>
-                <button onclick="deleteNews(${item.id})" class="btn-delete">মুছুন</button>
+    newsList.innerHTML = news.map(item => \
+        <div class=\"admin-news-item\">
+            <div class=\"admin-news-header\">
+                <h4>\</h4>
+                <button onclick=\"deleteNews(\)\" class=\"btn-delete\">মুছুন</button>
             </div>
-            <p class="admin-news-meta">
-                <strong>ক্যাটাগরি:</strong> ${item.category} | 
-                <strong>তারিখ:</strong> ${item.date} | 
-                <strong>লেখক:</strong> ${item.author}
+            <p class=\"admin-news-meta\">
+                <strong>ক্যাটাগরি:</strong> \ | 
+                <strong>তারিখ:</strong> \ | 
+                <strong>লেখক:</strong> \
             </p>
-            <p>${item.description.substring(0, 100)}...</p>
+            <p>\...</p>
         </div>
-    `).join('');
+    \).join('');
 }
 
-// Delete News
 function deleteNews(id) {
     if (confirm('এই খবর সত্যি মুছবেন?')) {
         let news = JSON.parse(localStorage.getItem('userNews')) || [];

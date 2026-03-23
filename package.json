@@ -1,0 +1,25 @@
+{
+  "name": "news-portal",
+  "version": "1.0.0",
+  "description": "News Portal Website with Admin Panel",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js",
+    "dev": "nodemon api.js"
+  },
+  "keywords": [
+    "news",
+    "portal",
+    "bengali",
+    "admin"
+  ],
+  "author": "Nuruzzaman Nuru",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

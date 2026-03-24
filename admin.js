@@ -9,6 +9,15 @@ const newsForm = document.getElementById("news-form");
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "1234";
 
+function isAdminPostedNews(item) {
+    if (!item || typeof item !== "object") return false;
+
+    const postedBy = (item.postedBy || "").toString().trim().toLowerCase();
+    const id = (item.id || "").toString();
+
+    return postedBy === ADMIN_USERNAME || id.startsWith("admin_");
+}
+
 window.addEventListener("load", () => {
     const isLoggedIn = localStorage.getItem("adminLoggedIn");
     if (isLoggedIn) {
@@ -92,7 +101,8 @@ newsForm.addEventListener("submit", async (e) => {
     try {
         // Get existing user news
         const savedUserNews = localStorage.getItem('userNews');
-        let userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        let userNews = parsedUserNews.filter(isAdminPostedNews);
         
         // Add new news to beginning
         userNews.unshift(newNews);
@@ -120,7 +130,12 @@ function loadRecentNews() {
     const newsList = document.getElementById("admin-news-list");
     
     const savedUserNews = localStorage.getItem('userNews');
-    const userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+    const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+    const userNews = parsedUserNews.filter(isAdminPostedNews);
+
+    if (userNews.length !== parsedUserNews.length) {
+        localStorage.setItem('userNews', JSON.stringify(userNews));
+    }
     
     if (userNews.length === 0) {
         newsList.innerHTML = "<p style=\"color: #999;\">এখনও কোনো খবর পোস্ট হয়নি</p>";
@@ -148,6 +163,7 @@ function deleteNews(id) {
         try {
             const savedUserNews = localStorage.getItem('userNews');
             let userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+            userNews = userNews.filter(isAdminPostedNews);
             
             // Remove news by id
             userNews = userNews.filter(item => item.id !== id);

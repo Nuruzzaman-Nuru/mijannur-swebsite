@@ -1,7 +1,12 @@
 // Display news in banner format
 function displayNewsAsBanners(newsArray, containerId) {
     const container = document.getElementById(containerId);
-    if (!container || newsArray.length === 0) return;
+    if (!container) return;
+
+    if (!newsArray || newsArray.length === 0) {
+        container.innerHTML = '<p style="padding: 1rem; color: #666;">No admin-posted news found.</p>';
+        return;
+    }
 
     container.innerHTML = '';
 
@@ -65,7 +70,12 @@ function displayNewsAsBanners(newsArray, containerId) {
 // Display featured news as large banner
 function displayFeaturedBanner(newsArray, containerId) {
     const container = document.getElementById(containerId);
-    if (!container || newsArray.length === 0) return;
+    if (!container) return;
+
+    if (!newsArray || newsArray.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
 
     const featured = newsArray[0];
     const imageUrl = featured.image || 'https://via.placeholder.com/800x400?text=Featured';

@@ -2,6 +2,19 @@
 const urlParams = new URLSearchParams(window.location.search);
 const newsId = urlParams.get('id');
 
+function isAdminPostedNews(item) {
+    if (!item || typeof item !== 'object') return false;
+
+    const postedBy = (item.postedBy || '').toString().trim().toLowerCase();
+    const id = (item.id || '').toString();
+
+    return postedBy === 'admin' || id.startsWith('admin_');
+}
+
+function getAdminOnlyNews(newsList) {
+    return (newsList || []).filter(isAdminPostedNews);
+}
+
 // Load and display news detail
 async function loadNewsDetail() {
     try {
@@ -12,10 +25,15 @@ async function loadNewsDetail() {
         allNews = data.news || [];
         
         // Load user news
-        const userNews = JSON.parse(localStorage.getItem('userNews')) || [];
+        const parsedUserNews = JSON.parse(localStorage.getItem('userNews')) || [];
+        const userNews = getAdminOnlyNews(parsedUserNews);
+
+        if (userNews.length !== parsedUserNews.length) {
+            localStorage.setItem('userNews', JSON.stringify(userNews));
+        }
         
         // Combine both
-        const combinedNews = [...userNews, ...allNews];
+        const combinedNews = getAdminOnlyNews([...userNews, ...allNews]);
         
         // Find the news by ID
         const news = combinedNews.find(item => item.id == newsId);

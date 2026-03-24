@@ -3,6 +3,19 @@ let allNews = [];
 let userNews = [];
 let currentCategory = null;
 
+function isAdminPostedNews(item) {
+    if (!item || typeof item !== 'object') return false;
+
+    const postedBy = (item.postedBy || '').toString().trim().toLowerCase();
+    const id = (item.id || '').toString();
+
+    return postedBy === 'admin' || id.startsWith('admin_');
+}
+
+function getAdminOnlyNews(newsList) {
+    return (newsList || []).filter(isAdminPostedNews);
+}
+
 // Load news from JSON and localStorage
 async function loadNews() {
     try {
@@ -11,9 +24,14 @@ async function loadNews() {
         allNews = data.news || [];
         
         const savedUserNews = localStorage.getItem('userNews');
-        userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        userNews = getAdminOnlyNews(parsedUserNews);
+
+        if (userNews.length !== parsedUserNews.length) {
+            localStorage.setItem('userNews', JSON.stringify(userNews));
+        }
         
-        const combinedNews = [...userNews, ...allNews];
+        const combinedNews = getAdminOnlyNews([...userNews, ...allNews]);
         
         displayFeaturedBanner(combinedNews, 'featured-news');
         displayNewsAsBanners(combinedNews, 'news-container');
@@ -79,7 +97,7 @@ function loadNewsByCategory(category) {
         'religion': 'ধর্ম'
     };
 
-    const combinedNews = [...userNews, ...allNews];
+    const combinedNews = getAdminOnlyNews([...userNews, ...allNews]);
     const filteredNews = combinedNews.filter(item => item.category === category);
     
     const newsSection = document.querySelector('.news-section h2');
@@ -95,7 +113,7 @@ function searchNews(query) {
         return;
     }
 
-    const combinedNews = [...userNews, ...allNews];
+    const combinedNews = getAdminOnlyNews([...userNews, ...allNews]);
     const searchResults = combinedNews.filter(item => 
         item.title.toLowerCase().includes(query.toLowerCase()) || 
         item.description.toLowerCase().includes(query.toLowerCase())

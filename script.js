@@ -3,20 +3,19 @@ let allNews = [];
 let userNews = [];
 let currentCategory = null;
 
-// Load news from JSON file and localStorage
+// Load news from database and localStorage
 async function loadNews() {
     try {
-        // Load news from JSON file
+        // Load from local database
+        allNews = await db.getAllNews();
+        
+        // Load from JSON file as fallback
         const response = await fetch('news.json');
         const data = await response.json();
-        allNews = data.news;
+        const jsonNews = data.news || [];
         
-        // Load user-posted news from localStorage
-        const savedUserNews = localStorage.getItem('userNews');
-        userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
-        
-        // Combine both - user news first (newest)
-        const combinedNews = [...userNews, ...allNews];
+        // Merge - database news first
+        const combinedNews = [...allNews, ...jsonNews];
         
         // Display featured news
         displayFeaturedNews(combinedNews);

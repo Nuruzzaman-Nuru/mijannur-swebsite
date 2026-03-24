@@ -8,14 +8,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Top Bar with Date and Social -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="current-date" id="current-date"></div>
+            <ul class="social-links">
+                <li><a href="https://web.facebook.com/mijanur.rahman.915304" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="https://youtube.com" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a></li>
+                <li><a href="https://twitter.com" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="https://instagram.com" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header with Logo and Search -->
     <header>
         <div class="navbar">
             <div class="container">
-                <div class="logo">📰 নিউজ পোর্টাল</div>
+                <a href="index.html" class="logo-link">
+                    <img src="images/logo.png" alt="নিউজ পোর্টাল" class="logo-img">
+                </a>
                 <div class="navbar-content">
                     <ul class="nav-links">
                         <li><a href="index.html">প্রচ্ছদ</a></li>
+                        <li><a href="news.html">সব খবর</a></li>
                         <li><a href="admin.html" class="active">অ্যাডমিন</a></li>
                     </ul>
                     <button id="logout-btn" class="btn-logout" style="display:none;">লগ আউট</button>

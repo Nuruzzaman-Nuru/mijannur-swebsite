@@ -68,14 +68,18 @@ newsForm.addEventListener("submit", async (e) => {
     const description = document.getElementById("description").value;
     const category = document.getElementById("category").value;
     const imageUrl = uploadedImageUrl || document.getElementById("image-url").value;
-    const author = document.getElementById("author").value || "অজানা";
+    const author = document.getElementById("author").value || "M TV";
     
     if (!title || !description || !category) {
         alert("সব তথ্য পূরণ করুন!");
         return;
     }
     
+    // Generate unique ID
+    const newId = 'admin_' + Date.now();
+    
     const newNews = {
+        id: newId,
         title: title,
         description: description,
         category: category,
@@ -86,31 +90,48 @@ newsForm.addEventListener("submit", async (e) => {
     };
     
     try {
-        await db.addNews(newNews);
+        // Get existing user news
+        const savedUserNews = localStorage.getItem('userNews');
+        let userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        
+        // Add new news to beginning
+        userNews.unshift(newNews);
+        
+        // Save back to localStorage
+        localStorage.setItem('userNews', JSON.stringify(userNews));
+        
         alert("খবর সফলভাবে পোস্ট হয়েছে!");
         newsForm.reset();
         uploadedImageUrl = "";
+        document.getElementById("image-url").value = "";
         loadRecentNews();
+        
+        // Reload news on main page if available
+        if (typeof loadNews === 'function') {
+            loadNews();
+        }
     } catch (error) {
         console.error("Error posting news:", error);
         alert("খবর পোস্ট করতে সমস্যা হয়েছে!");
     }
 });
 
-async function loadRecentNews() {
-    const news = await db.getAllNews();
+function loadRecentNews() {
     const newsList = document.getElementById("admin-news-list");
     
-    if (news.length === 0) {
+    const savedUserNews = localStorage.getItem('userNews');
+    const userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+    
+    if (userNews.length === 0) {
         newsList.innerHTML = "<p style=\"color: #999;\">এখনও কোনো খবর পোস্ট হয়নি</p>";
         return;
     }
     
-    newsList.innerHTML = news.map(item => `
+    newsList.innerHTML = userNews.map(item => `
         <div class="admin-news-item">
             <div class="admin-news-header">
                 <h4>${item.title}</h4>
-                <button onclick="deleteNews(${item.id})" class="btn-delete">মুছুন</button>
+                <button onclick="deleteNews('${item.id}')" class="btn-delete">মুছুন</button>
             </div>
             <p class="admin-news-meta">
                 <strong>ক্যাটাগরি:</strong> ${item.category} | 
@@ -122,12 +143,25 @@ async function loadRecentNews() {
     `).join("");
 }
 
-async function deleteNews(id) {
+function deleteNews(id) {
     if (confirm("এই খবর সত্যি মুছবেন?")) {
         try {
-            await db.deleteNews(id);
+            const savedUserNews = localStorage.getItem('userNews');
+            let userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+            
+            // Remove news by id
+            userNews = userNews.filter(item => item.id !== id);
+            
+            // Save back to localStorage
+            localStorage.setItem('userNews', JSON.stringify(userNews));
+            
             loadRecentNews();
             alert("খবর মুছে দেওয়া হয়েছে!");
+            
+            // Reload news on main page if available
+            if (typeof loadNews === 'function') {
+                loadNews();
+            }
         } catch (error) {
             console.error("Error deleting news:", error);
             alert("খবর মুছতে সমস্যা হয়েছে!");

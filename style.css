@@ -858,6 +858,19 @@ footer {
     text-transform: uppercase;
 }
 
+.news-banner-channel {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.channel-name {
+    color: #ffeb3b;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
 /* Multiple Banner Grid */
 .news-banners-grid {
     display: grid;

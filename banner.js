@@ -44,6 +44,9 @@ function displayNewsAsBanners(newsArray, containerId) {
                     <span class="news-banner-category">${categoryName}</span>
                     <span class="news-banner-date">📅 ${bengaliDate}</span>
                 </div>
+                <div class="news-banner-channel">
+                    ${item.author ? `<span class="channel-name">📺 ${item.author}</span>` : '<span class="channel-name">📺 M TV</span>'}
+                </div>
             </div>
         `;
 
@@ -98,7 +101,9 @@ function displayFeaturedBanner(newsArray, containerId) {
             <div class="news-banner-meta">
                 <span class="news-banner-category">${categoryName}</span>
                 <span class="news-banner-date">📅 ${bengaliDate}</span>
-                ${featured.author ? `<span>✍️ ${featured.author}</span>` : ''}
+            </div>
+            <div class="news-banner-channel">
+                <span class="channel-name">📺 ${featured.author || 'M TV'}</span>
             </div>
         </div>
     `;

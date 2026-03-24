@@ -106,11 +106,10 @@ function displayAllNews(newsArray) {
     };
 
     newsArray.forEach(item => {
-        const newsCard = document.createElement('div');
-        newsCard.className = 'news-card';
-        newsCard.style.cursor = 'pointer';
+        const newsBanner = document.createElement('div');
+        newsBanner.className = 'news-modern-banner';
         
-        const imageUrl = item.image || 'https://via.placeholder.com/300x200?text=No+Image';
+        const imageUrl = item.image || 'https://via.placeholder.com/400x350?text=খবর';
         const bengaliDate = new Date(item.date).toLocaleDateString('bn-BD', {
             year: 'numeric',
             month: 'long',
@@ -119,23 +118,24 @@ function displayAllNews(newsArray) {
 
         const categoryName = categoryMap[item.category] || item.category;
         
-        newsCard.innerHTML = `
-            <img src="${imageUrl}" alt="${item.title}" class="news-image">
-            <div class="news-content">
-                <span class="news-category">${categoryName}</span>
-                <h3 class="news-title">${item.title}</h3>
-                <p class="news-description">${item.description.substring(0, 100)}...</p>
-                <p class="news-date">📅 ${bengaliDate}</p>
-                ${item.author ? `<p class="news-author"><strong>লেখক:</strong> ${item.author}</p>` : ''}
+        newsBanner.innerHTML = `
+            <img src="${imageUrl}" alt="${item.title}" class="news-modern-image">
+            <div class="news-modern-overlay">
+                <h3 class="news-modern-title">${item.title}</h3>
+                <div class="news-modern-meta">
+                    <span class="news-modern-category">${categoryName}</span>
+                    <span class="news-modern-date">📅 ${bengaliDate}</span>
+                    ${item.author ? `<span class="news-modern-author">✍️ ${item.author}</span>` : ''}
+                </div>
             </div>
         `;
         
         // Add click handler to navigate to detail page
-        newsCard.addEventListener('click', () => {
+        newsBanner.addEventListener('click', () => {
             window.location.href = `detail.html?id=${item.id}`;
         });
         
-        newsContainer.appendChild(newsCard);
+        newsContainer.appendChild(newsBanner);
     });
 }
 

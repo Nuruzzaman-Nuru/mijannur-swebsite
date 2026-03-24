@@ -800,6 +800,10 @@ footer {
     margin-bottom: 2rem;
     cursor: pointer;
     transition: transform 0.3s;
+    background: linear-gradient(to bottom, rgba(200, 16, 16, 0.9), rgba(200, 16, 16, 0.95));
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .news-banner:hover {
@@ -807,10 +811,11 @@ footer {
 }
 
 .news-banner-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
     display: block;
+    border-radius: 4px;
 }
 
 .news-banner-overlay {
@@ -818,9 +823,9 @@ footer {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(200, 16, 16, 0.95), rgba(200, 16, 16, 0.7));
+    background: linear-gradient(to top, rgba(200, 16, 16, 0.98), rgba(200, 16, 16, 0.85));
     padding: 2rem;
-    min-height: 40%;
+    min-height: 45%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -880,25 +885,36 @@ footer {
 }
 
 .news-banner-small {
-    height: 300px;
+    height: 280px;
 }
 
 .news-banner-small .news-banner-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+}
+
+.news-banner-small .news-banner-image {
+    width: 55%;
+    height: 55%;
 }
 
 /* Responsive Banner */
 @media (max-width: 768px) {
     .news-banner {
-        height: 280px;
+        height: 250px;
+    }
+
+    .news-banner-image {
+        width: 55%;
+        height: 55%;
     }
 
     .news-banner-overlay {
         padding: 1.5rem;
+        min-height: 48%;
     }
 
     .news-banner-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 
     .news-banners-grid {
@@ -908,15 +924,21 @@ footer {
 
 @media (max-width: 480px) {
     .news-banner {
-        height: 220px;
+        height: 200px;
+    }
+
+    .news-banner-image {
+        width: 50%;
+        height: 50%;
     }
 
     .news-banner-overlay {
         padding: 1rem;
+        min-height: 50%;
     }
 
     .news-banner-title {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .news-banner-meta {

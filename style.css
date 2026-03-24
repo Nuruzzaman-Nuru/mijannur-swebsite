@@ -702,6 +702,45 @@ footer {
     background-color: #c0392b;
 }
 
+.btn-edit {
+    padding: 0.4rem 0.8rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+    margin-right: 0.5rem;
+}
+
+.btn-edit:hover {
+    background-color: #2980b9;
+}
+
+.btn-cancel-edit {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-cancel-edit:hover {
+    background-color: #7f8c8d;
+}
+
+.form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+}
+
 .recent-news {
     background: white;
     padding: 2rem;
@@ -732,6 +771,11 @@ footer {
 .admin-news-header h4 {
     flex: 1;
     color: #2c3e50;
+}
+
+.admin-news-actions {
+    display: flex;
+    align-items: center;
 }
 
 .admin-news-meta {

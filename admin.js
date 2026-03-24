@@ -1,16 +1,22 @@
-﻿// Admin Panel Functionality
+// Admin Panel Functionality
 
 const loginForm = document.getElementById("login-form");
 const loginSection = document.getElementById("login-section");
 const adminPanel = document.getElementById("admin-panel");
 const logoutBtn = document.getElementById("logout-btn");
 const newsForm = document.getElementById("news-form");
+const formTitle = document.getElementById("admin-form-title") || document.querySelector("#admin-panel h2");
+const submitNewsBtn = document.getElementById("submit-news-btn");
+const cancelEditBtn = document.getElementById("cancel-edit-btn");
 
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "1234";
+const ADMIN_USERNAME = "adminmijanur";
+const ADMIN_PASSWORD = "12345678";
 const API_NEWS_ENDPOINT = "/api/news";
 const MAX_IMAGE_WIDTH = 1280;
 const IMAGE_QUALITY = 0.75;
+let editingNewsId = null;
+let editingOriginalDate = null;
+let currentAdminNews = [];
 
 function getParsedUserNews() {
     try {
@@ -89,6 +95,21 @@ async function createNewsInApi(newsPayload) {
     }
 }
 
+async function updateNewsInApi(id, newsPayload) {
+    try {
+        const response = await fetch(`${API_NEWS_ENDPOINT}/${encodeURIComponent(id)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newsPayload)
+        });
+
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        return null;
+    }
+}
+
 async function deleteNewsFromApi(id) {
     try {
         const response = await fetch(`${API_NEWS_ENDPOINT}/${encodeURIComponent(id)}`, {
@@ -139,6 +160,7 @@ logoutBtn.addEventListener("click", () => {
     adminPanel.style.display = "none";
     logoutBtn.style.display = "none";
     loginForm.reset();
+    resetNewsFormToCreateMode();
 });
 
 function showAdminPanel() {
@@ -146,6 +168,31 @@ function showAdminPanel() {
     adminPanel.style.display = "block";
     logoutBtn.style.display = "block";
 }
+
+function setCreateMode() {
+    editingNewsId = null;
+    editingOriginalDate = null;
+
+    if (formTitle) formTitle.textContent = "নিউজ পোস্ট করুন";
+    if (submitNewsBtn) submitNewsBtn.textContent = "নিউজ পোস্ট করুন";
+    if (cancelEditBtn) cancelEditBtn.style.display = "none";
+}
+
+function setEditMode() {
+    if (formTitle) formTitle.textContent = "নিউজ এডিট করুন";
+    if (submitNewsBtn) submitNewsBtn.textContent = "এডিট সেভ করুন";
+    if (cancelEditBtn) cancelEditBtn.style.display = "block";
+}
+
+function resetNewsFormToCreateMode() {
+    newsForm.reset();
+    uploadedImageUrl = "";
+    document.getElementById("image-url").value = "";
+    if (imageFile) imageFile.value = "";
+    setCreateMode();
+}
+
+setCreateMode();
 
 let uploadedImageUrl = "";
 const imageFile = document.getElementById("image-file");
@@ -162,6 +209,12 @@ imageFile.addEventListener("change", async (e) => {
     }
 });
 
+if (cancelEditBtn) {
+    cancelEditBtn.addEventListener("click", () => {
+        resetNewsFormToCreateMode();
+    });
+}
+
 newsForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     
@@ -176,16 +229,12 @@ newsForm.addEventListener("submit", async (e) => {
         return;
     }
     
-    // Generate local fallback ID
-    const newId = 'admin_' + Date.now();
-    
-    const newNews = {
-        id: newId,
+    const fallbackImage = imageUrl || "https://via.placeholder.com/300x200?text=No+Image";
+    const basePayload = {
         title: title,
         description: description,
         category: category,
-        image: imageUrl || "https://via.placeholder.com/300x200?text=No+Image",
-        date: new Date().toISOString().split("T")[0],
+        image: fallbackImage,
         author: author,
         postedBy: localStorage.getItem("adminUsername")
     };
@@ -195,28 +244,63 @@ newsForm.addEventListener("submit", async (e) => {
         const parsedUserNews = getParsedUserNews();
         let userNews = parsedUserNews.filter(isAdminPostedNews);
 
-        // Try central API first for cross-device visibility
-        const createdByApi = await createNewsInApi(newNews);
-        const effectiveNews = createdByApi || newNews;
+        let effectiveNews = null;
+        let successMessage = "";
 
-        // Update local cache (fallback/offline + quick UI refresh)
-        userNews = userNews.filter(item => item.id !== effectiveNews.id);
-        userNews.unshift(effectiveNews);
-        
-        // Save back to localStorage (best effort)
-        const cacheSaved = saveUserNewsSafe(userNews);
-        
-        if (createdByApi) {
-            alert("খবর সফলভাবে পোস্ট হয়েছে! এখন ফোন ও ল্যাপটপে দেখা যাবে।");
-        } else if (cacheSaved) {
-            alert("খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।");
+        if (editingNewsId) {
+            const existing = currentAdminNews.find(item => String(item.id) === String(editingNewsId));
+            const updatePayload = {
+                ...basePayload,
+                date: editingOriginalDate || (existing && existing.date) || new Date().toISOString().split("T")[0]
+            };
+
+            const updatedByApi = await updateNewsInApi(editingNewsId, updatePayload);
+            effectiveNews = updatedByApi || { ...(existing || {}), ...updatePayload, id: editingNewsId };
+
+            userNews = userNews.map(item =>
+                String(item.id) === String(editingNewsId) ? effectiveNews : item
+            );
+
+            if (!userNews.some(item => String(item.id) === String(editingNewsId))) {
+                userNews.unshift(effectiveNews);
+            }
+
+            const cacheSaved = saveUserNewsSafe(userNews);
+            if (!updatedByApi && !cacheSaved) {
+                alert("এডিট সেভ হয়নি। server/API এবং storage check করুন।");
+                return;
+            }
+
+            successMessage = updatedByApi
+                ? "খবর এডিট সফল হয়েছে! সব ডিভাইসে আপডেট দেখাবে।"
+                : "খবর এডিট হয়েছে, কিন্তু server/API অফ থাকায় শুধু এই ডিভাইসে আপডেট দেখাবে।";
         } else {
-            alert("খবর পোস্ট হয়নি। ছবি খুব বড় হতে পারে, image URL দিন বা ছোট ছবি ব্যবহার করুন।");
-            return;
+            const newNews = {
+                id: "admin_" + Date.now(),
+                ...basePayload,
+                date: new Date().toISOString().split("T")[0]
+            };
+
+            const createdByApi = await createNewsInApi(newNews);
+            effectiveNews = createdByApi || newNews;
+
+            // Update local cache (fallback/offline + quick UI refresh)
+            userNews = userNews.filter(item => String(item.id) !== String(effectiveNews.id));
+            userNews.unshift(effectiveNews);
+
+            const cacheSaved = saveUserNewsSafe(userNews);
+            if (!createdByApi && !cacheSaved) {
+                alert("খবর পোস্ট হয়নি। ছবি খুব বড় হতে পারে, image URL দিন বা ছোট ছবি ব্যবহার করুন।");
+                return;
+            }
+
+            successMessage = createdByApi
+                ? "খবর সফলভাবে পোস্ট হয়েছে! এখন ফোন ও ল্যাপটপে দেখা যাবে।"
+                : "খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।";
         }
-        newsForm.reset();
-        uploadedImageUrl = "";
-        document.getElementById("image-url").value = "";
+
+        alert(successMessage);
+        resetNewsFormToCreateMode();
         await loadRecentNews();
         
         // Reload news on main page if available
@@ -247,7 +331,10 @@ async function loadRecentNews() {
         }
     }
     
+    currentAdminNews = userNews;
+
     if (userNews.length === 0) {
+        if (editingNewsId) resetNewsFormToCreateMode();
         newsList.innerHTML = "<p style=\"color: #999;\">এখনও কোনো খবর পোস্ট হয়নি</p>";
         return;
     }
@@ -256,7 +343,10 @@ async function loadRecentNews() {
         <div class="admin-news-item">
             <div class="admin-news-header">
                 <h4>${item.title}</h4>
-                <button onclick="deleteNews('${item.id}')" class="btn-delete">মুছুন</button>
+                <div class="admin-news-actions">
+                    <button onclick="beginEditNews('${item.id}')" class="btn-edit">এডিট</button>
+                    <button onclick="deleteNews('${item.id}')" class="btn-delete">মুছুন</button>
+                </div>
             </div>
             <p class="admin-news-meta">
                 <strong>ক্যাটাগরি:</strong> ${item.category} | 
@@ -268,22 +358,54 @@ async function loadRecentNews() {
     `).join("");
 }
 
+function beginEditNews(id) {
+    const newsItem = currentAdminNews.find(item => String(item.id) === String(id));
+    if (!newsItem) {
+        alert("খবর খুঁজে পাওয়া যায়নি।");
+        return;
+    }
+
+    editingNewsId = newsItem.id;
+    editingOriginalDate = newsItem.date;
+    uploadedImageUrl = newsItem.image || "";
+
+    document.getElementById("title").value = newsItem.title || "";
+    document.getElementById("description").value = newsItem.description || "";
+    document.getElementById("category").value = newsItem.category || "";
+    document.getElementById("author").value = newsItem.author || "M TV";
+    document.getElementById("image-url").value = newsItem.image && /^https?:\/\//i.test(newsItem.image)
+        ? newsItem.image
+        : "";
+    if (imageFile) imageFile.value = "";
+
+    setEditMode();
+    newsForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 async function deleteNews(id) {
     if (confirm("এই খবর সত্যি মুছবেন?")) {
         try {
-            await deleteNewsFromApi(id);
+            const deletedFromApi = await deleteNewsFromApi(id);
 
             let userNews = getParsedUserNews();
             userNews = userNews.filter(isAdminPostedNews);
             
             // Remove news by id
-            userNews = userNews.filter(item => item.id !== id);
+            userNews = userNews.filter(item => String(item.id) !== String(id));
             
             // Save back to localStorage
             saveUserNewsSafe(userNews);
+
+            if (String(editingNewsId) === String(id)) {
+                resetNewsFormToCreateMode();
+            }
             
             await loadRecentNews();
-            alert("খবর মুছে দেওয়া হয়েছে!");
+            if (deletedFromApi) {
+                alert("খবর মুছে দেওয়া হয়েছে।");
+            } else {
+                alert("খবর লোকালি মুছে দেওয়া হয়েছে, কিন্তু server/API থেকে মুছতে সমস্যা হয়েছে।");
+            }
             
             // Reload news on main page if available
             if (typeof loadNews === 'function') {

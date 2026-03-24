@@ -8,6 +8,97 @@ const newsForm = document.getElementById("news-form");
 
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "1234";
+const API_NEWS_ENDPOINT = "/api/news";
+const MAX_IMAGE_WIDTH = 1280;
+const IMAGE_QUALITY = 0.75;
+
+function getParsedUserNews() {
+    try {
+        const savedUserNews = localStorage.getItem("userNews");
+        return savedUserNews ? JSON.parse(savedUserNews) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveUserNewsSafe(newsList) {
+    try {
+        localStorage.setItem("userNews", JSON.stringify(newsList));
+        return true;
+    } catch (error) {
+        console.warn("Could not save all news to localStorage:", error);
+        return false;
+    }
+}
+
+function compressImageFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("image_read_failed"));
+        reader.onload = () => {
+            const image = new Image();
+            image.onerror = () => reject(new Error("image_decode_failed"));
+            image.onload = () => {
+                const ratio = Math.min(1, MAX_IMAGE_WIDTH / image.width);
+                const width = Math.max(1, Math.round(image.width * ratio));
+                const height = Math.max(1, Math.round(image.height * ratio));
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const context = canvas.getContext("2d");
+
+                if (!context) {
+                    reject(new Error("canvas_not_supported"));
+                    return;
+                }
+
+                context.drawImage(image, 0, 0, width, height);
+                resolve(canvas.toDataURL("image/jpeg", IMAGE_QUALITY));
+            };
+            image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+async function loadNewsFromApi() {
+    try {
+        const response = await fetch(API_NEWS_ENDPOINT, { cache: "no-store" });
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return Array.isArray(data) ? data : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function createNewsInApi(newsPayload) {
+    try {
+        const response = await fetch(API_NEWS_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newsPayload)
+        });
+
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        return null;
+    }
+}
+
+async function deleteNewsFromApi(id) {
+    try {
+        const response = await fetch(`${API_NEWS_ENDPOINT}/${encodeURIComponent(id)}`, {
+            method: "DELETE"
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+}
 
 function isAdminPostedNews(item) {
     if (!item || typeof item !== "object") return false;
@@ -18,11 +109,11 @@ function isAdminPostedNews(item) {
     return postedBy === ADMIN_USERNAME || id.startsWith("admin_");
 }
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
     const isLoggedIn = localStorage.getItem("adminLoggedIn");
     if (isLoggedIn) {
         showAdminPanel();
-        loadRecentNews();
+        await loadRecentNews();
     }
 });
 
@@ -58,15 +149,16 @@ function showAdminPanel() {
 
 let uploadedImageUrl = "";
 const imageFile = document.getElementById("image-file");
-imageFile.addEventListener("change", (e) => {
+imageFile.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            uploadedImageUrl = event.target.result;
+        try {
+            uploadedImageUrl = await compressImageFile(file);
             document.getElementById("image-url").value = "";
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+            uploadedImageUrl = "";
+            alert("ছবি প্রসেস করা যায়নি। ছোট ছবি দিন বা image URL ব্যবহার করুন।");
+        }
     }
 });
 
@@ -84,7 +176,7 @@ newsForm.addEventListener("submit", async (e) => {
         return;
     }
     
-    // Generate unique ID
+    // Generate local fallback ID
     const newId = 'admin_' + Date.now();
     
     const newNews = {
@@ -99,22 +191,33 @@ newsForm.addEventListener("submit", async (e) => {
     };
     
     try {
-        // Get existing user news
-        const savedUserNews = localStorage.getItem('userNews');
-        const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+        // Keep local cache cleaned
+        const parsedUserNews = getParsedUserNews();
         let userNews = parsedUserNews.filter(isAdminPostedNews);
+
+        // Try central API first for cross-device visibility
+        const createdByApi = await createNewsInApi(newNews);
+        const effectiveNews = createdByApi || newNews;
+
+        // Update local cache (fallback/offline + quick UI refresh)
+        userNews = userNews.filter(item => item.id !== effectiveNews.id);
+        userNews.unshift(effectiveNews);
         
-        // Add new news to beginning
-        userNews.unshift(newNews);
+        // Save back to localStorage (best effort)
+        const cacheSaved = saveUserNewsSafe(userNews);
         
-        // Save back to localStorage
-        localStorage.setItem('userNews', JSON.stringify(userNews));
-        
-        alert("খবর সফলভাবে পোস্ট হয়েছে!");
+        if (createdByApi) {
+            alert("খবর সফলভাবে পোস্ট হয়েছে! এখন ফোন ও ল্যাপটপে দেখা যাবে।");
+        } else if (cacheSaved) {
+            alert("খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।");
+        } else {
+            alert("খবর পোস্ট হয়নি। ছবি খুব বড় হতে পারে, image URL দিন বা ছোট ছবি ব্যবহার করুন।");
+            return;
+        }
         newsForm.reset();
         uploadedImageUrl = "";
         document.getElementById("image-url").value = "";
-        loadRecentNews();
+        await loadRecentNews();
         
         // Reload news on main page if available
         if (typeof loadNews === 'function') {
@@ -126,15 +229,22 @@ newsForm.addEventListener("submit", async (e) => {
     }
 });
 
-function loadRecentNews() {
+async function loadRecentNews() {
     const newsList = document.getElementById("admin-news-list");
-    
-    const savedUserNews = localStorage.getItem('userNews');
-    const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
-    const userNews = parsedUserNews.filter(isAdminPostedNews);
 
-    if (userNews.length !== parsedUserNews.length) {
-        localStorage.setItem('userNews', JSON.stringify(userNews));
+    const apiNews = await loadNewsFromApi();
+    let userNews;
+
+    if (Array.isArray(apiNews)) {
+        userNews = apiNews.filter(isAdminPostedNews);
+        saveUserNewsSafe(userNews);
+    } else {
+        const parsedUserNews = getParsedUserNews();
+        userNews = parsedUserNews.filter(isAdminPostedNews);
+
+        if (userNews.length !== parsedUserNews.length) {
+            saveUserNewsSafe(userNews);
+        }
     }
     
     if (userNews.length === 0) {
@@ -158,20 +268,21 @@ function loadRecentNews() {
     `).join("");
 }
 
-function deleteNews(id) {
+async function deleteNews(id) {
     if (confirm("এই খবর সত্যি মুছবেন?")) {
         try {
-            const savedUserNews = localStorage.getItem('userNews');
-            let userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+            await deleteNewsFromApi(id);
+
+            let userNews = getParsedUserNews();
             userNews = userNews.filter(isAdminPostedNews);
             
             // Remove news by id
             userNews = userNews.filter(item => item.id !== id);
             
             // Save back to localStorage
-            localStorage.setItem('userNews', JSON.stringify(userNews));
+            saveUserNewsSafe(userNews);
             
-            loadRecentNews();
+            await loadRecentNews();
             alert("খবর মুছে দেওয়া হয়েছে!");
             
             // Reload news on main page if available

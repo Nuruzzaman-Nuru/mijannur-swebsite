@@ -1,6 +1,7 @@
 // Get news ID from URL
 const urlParams = new URLSearchParams(window.location.search);
 const newsId = urlParams.get('id');
+const API_NEWS_ENDPOINT = '/api/news';
 
 function isAdminPostedNews(item) {
     if (!item || typeof item !== 'object') return false;
@@ -15,21 +16,44 @@ function getAdminOnlyNews(newsList) {
     return (newsList || []).filter(isAdminPostedNews);
 }
 
+function saveUserNewsSafe(newsList) {
+    try {
+        localStorage.setItem('userNews', JSON.stringify(newsList));
+    } catch (error) {
+        console.warn('Could not cache news in localStorage:', error);
+    }
+}
+
+async function loadNewsFromApi() {
+    try {
+        const response = await fetch(API_NEWS_ENDPOINT, { cache: 'no-store' });
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return Array.isArray(data) ? data : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function loadNewsFromJsonFile() {
+    const response = await fetch('news.json');
+    const data = await response.json();
+    return data.news || [];
+}
+
 // Load and display news detail
 async function loadNewsDetail() {
     try {
-        // Load from JSON
-        let allNews = [];
-        const response = await fetch('news.json');
-        const data = await response.json();
-        allNews = data.news || [];
+        const apiNews = await loadNewsFromApi();
+        const allNews = Array.isArray(apiNews) ? apiNews : await loadNewsFromJsonFile();
         
         // Load user news
         const parsedUserNews = JSON.parse(localStorage.getItem('userNews')) || [];
         const userNews = getAdminOnlyNews(parsedUserNews);
 
         if (userNews.length !== parsedUserNews.length) {
-            localStorage.setItem('userNews', JSON.stringify(userNews));
+            saveUserNewsSafe(userNews);
         }
         
         // Combine both

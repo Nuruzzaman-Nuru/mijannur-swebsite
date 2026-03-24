@@ -2,6 +2,7 @@
 let allNews = [];
 let userNews = [];
 let currentCategory = null;
+const API_NEWS_ENDPOINT = '/api/news';
 
 function isAdminPostedNews(item) {
     if (!item || typeof item !== 'object') return false;
@@ -16,25 +17,63 @@ function getAdminOnlyNews(newsList) {
     return (newsList || []).filter(isAdminPostedNews);
 }
 
+function saveUserNewsSafe(newsList) {
+    try {
+        localStorage.setItem('userNews', JSON.stringify(newsList));
+    } catch (error) {
+        console.warn('Could not cache news in localStorage:', error);
+    }
+}
+
+async function loadNewsFromApi() {
+    try {
+        const response = await fetch(API_NEWS_ENDPOINT, { cache: 'no-store' });
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return Array.isArray(data) ? data : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function loadNewsFromJsonFile() {
+    const response = await fetch('news.json');
+    const data = await response.json();
+    return data.news || [];
+}
+
 // Load news from JSON and localStorage
 async function loadNews() {
     try {
-        const response = await fetch('news.json');
-        const data = await response.json();
-        allNews = data.news || [];
-        
-        const savedUserNews = localStorage.getItem('userNews');
-        const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
-        userNews = getAdminOnlyNews(parsedUserNews);
+        const apiNews = await loadNewsFromApi();
 
-        if (userNews.length !== parsedUserNews.length) {
-            localStorage.setItem('userNews', JSON.stringify(userNews));
+        if (Array.isArray(apiNews)) {
+            allNews = apiNews;
+            userNews = [];
+            saveUserNewsSafe(getAdminOnlyNews(apiNews));
+        } else {
+            allNews = await loadNewsFromJsonFile();
+
+            const savedUserNews = localStorage.getItem('userNews');
+            const parsedUserNews = savedUserNews ? JSON.parse(savedUserNews) : [];
+            userNews = getAdminOnlyNews(parsedUserNews);
+
+            if (userNews.length !== parsedUserNews.length) {
+                saveUserNewsSafe(userNews);
+            }
         }
         
         const combinedNews = getAdminOnlyNews([...userNews, ...allNews]);
-        
-        displayFeaturedBanner(combinedNews, 'featured-news');
-        displayNewsAsBanners(combinedNews, 'news-container');
+
+        if (typeof displayFeaturedBanner === 'function') {
+            displayFeaturedBanner(combinedNews, 'featured-news');
+        }
+
+        if (typeof displayNewsAsBanners === 'function') {
+            displayNewsAsBanners(combinedNews, 'news-container');
+        }
+
         displayPopularNews(combinedNews);
     } catch (error) {
         console.error('Error:', error);

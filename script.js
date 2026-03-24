@@ -3,25 +3,24 @@ let allNews = [];
 let userNews = [];
 let currentCategory = null;
 
-// Load news from database and localStorage
+// Load news from JSON and localStorage
 async function loadNews() {
     try {
-        // Load from local database
-        allNews = await db.getAllNews();
-        
-        // Load from JSON file as fallback
+        // Load from JSON file
         const response = await fetch('news.json');
         const data = await response.json();
-        const jsonNews = data.news || [];
+        allNews = data.news || [];
         
-        // Merge - database news first
-        const combinedNews = [...allNews, ...jsonNews];
+        // Load from localStorage (admin posted news)
+        const savedUserNews = localStorage.getItem('userNews');
+        userNews = savedUserNews ? JSON.parse(savedUserNews) : [];
         
-        // Display featured news
-        displayFeaturedNews(combinedNews);
+        // Combine - user news first (newest)
+        const combinedNews = [...userNews, ...allNews];
         
-        // Display all news
-        displayAllNews(combinedNews);
+        // Display as banners
+        displayFeaturedBanner(combinedNews, 'featured-news');
+        displayNewsAsBanners(combinedNews, 'news-container');
         
         // Display popular news in sidebar
         displayPopularNews(combinedNews);

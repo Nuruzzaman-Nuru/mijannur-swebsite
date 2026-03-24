@@ -4,20 +4,20 @@ function displayNewsAsBanners(newsArray, containerId) {
     if (!container || newsArray.length === 0) return;
 
     container.innerHTML = '';
-    
+
     const categoryMap = {
-        'national': 'জাতীয়',
-        'international': 'আন্তর্জাতিক',
-        'politics': 'রাজনীতি',
-        'corporate': 'কর্পোরেট',
-        'education': 'শিক্ষা',
-        'health': 'স্বাস্থ্য',
-        'sports': 'খেলা',
-        'technology': 'প্রযুক্তি',
-        'lifestyle': 'লাইফস্টাইল',
-        'feature': 'ফিচার',
-        'law': 'আইন',
-        'religion': 'ধর্ম'
+        national: 'National',
+        international: 'International',
+        politics: 'Politics',
+        corporate: 'Corporate',
+        education: 'Education',
+        health: 'Health',
+        sports: 'Sports',
+        technology: 'Technology',
+        lifestyle: 'Lifestyle',
+        feature: 'Feature',
+        law: 'Law',
+        religion: 'Religion'
     };
 
     const bannersGrid = document.createElement('div');
@@ -27,7 +27,7 @@ function displayNewsAsBanners(newsArray, containerId) {
         const banner = document.createElement('div');
         banner.className = 'news-banner news-banner-small';
         banner.style.cursor = 'pointer';
-        
+
         const imageUrl = item.image || 'https://via.placeholder.com/400x300?text=News';
         const bengaliDate = new Date(item.date).toLocaleDateString('bn-BD', {
             day: '2-digit',
@@ -37,16 +37,18 @@ function displayNewsAsBanners(newsArray, containerId) {
         const categoryName = categoryMap[item.category] || item.category;
 
         banner.innerHTML = `
-            <img src="${imageUrl}" alt="${item.title}" class="news-banner-image">
-            <div class="news-banner-overlay">
-                <h3 class="news-banner-title">${item.title}</h3>
+            <div class="news-banner-media">
+                <img src="${imageUrl}" alt="${item.title}" class="news-banner-image">
+                <img src="images/logo.png" alt="M TV" class="news-banner-corner-logo">
+            </div>
+            <div class="news-banner-caption">
                 <div class="news-banner-meta">
                     <span class="news-banner-category">${categoryName}</span>
-                    <span class="news-banner-date">📅 ${bengaliDate}</span>
+                    <span class="news-banner-date">Date: ${bengaliDate}</span>
+                    <span class="news-banner-author">By: ${item.author || 'M TV'}</span>
+                    <span class="channel-badge">M TV</span>
                 </div>
-                <div class="news-banner-channel">
-                    ${item.author ? `<span class="channel-name">📺 ${item.author}</span>` : '<span class="channel-name">📺 M TV</span>'}
-                </div>
+                <h3 class="news-banner-title">${item.title}</h3>
             </div>
         `;
 
@@ -75,18 +77,18 @@ function displayFeaturedBanner(newsArray, containerId) {
     });
 
     const categoryMap = {
-        'national': 'জাতীয়',
-        'international': 'আন্তর্জাতিক',
-        'politics': 'রাজনীতি',
-        'corporate': 'কর্পোরেট',
-        'education': 'শিক্ষা',
-        'health': 'স্বাস্থ্য',
-        'sports': 'খেলা',
-        'technology': 'প্রযুক্তি',
-        'lifestyle': 'লাইফস্টাইল',
-        'feature': 'ফিচার',
-        'law': 'আইন',
-        'religion': 'ধর্ম'
+        national: 'National',
+        international: 'International',
+        politics: 'Politics',
+        corporate: 'Corporate',
+        education: 'Education',
+        health: 'Health',
+        sports: 'Sports',
+        technology: 'Technology',
+        lifestyle: 'Lifestyle',
+        feature: 'Feature',
+        law: 'Law',
+        religion: 'Religion'
     };
 
     const categoryName = categoryMap[featured.category] || featured.category;
@@ -95,16 +97,18 @@ function displayFeaturedBanner(newsArray, containerId) {
     banner.className = 'news-banner';
     banner.style.cursor = 'pointer';
     banner.innerHTML = `
-        <img src="${imageUrl}" alt="${featured.title}" class="news-banner-image">
-        <div class="news-banner-overlay">
-            <h2 class="news-banner-title">${featured.title}</h2>
+        <div class="news-banner-media">
+            <img src="${imageUrl}" alt="${featured.title}" class="news-banner-image">
+            <img src="images/logo.png" alt="M TV" class="news-banner-corner-logo">
+        </div>
+        <div class="news-banner-caption">
             <div class="news-banner-meta">
                 <span class="news-banner-category">${categoryName}</span>
-                <span class="news-banner-date">📅 ${bengaliDate}</span>
+                <span class="news-banner-date">Date: ${bengaliDate}</span>
+                <span class="news-banner-author">By: ${featured.author || 'M TV'}</span>
+                <span class="channel-badge">M TV</span>
             </div>
-            <div class="news-banner-channel">
-                <span class="channel-name">📺 ${featured.author || 'M TV'}</span>
-            </div>
+            <h2 class="news-banner-title">${featured.title}</h2>
         </div>
     `;
 

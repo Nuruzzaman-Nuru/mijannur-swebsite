@@ -46,10 +46,24 @@ function isDataImageUrl(value) {
     return typeof value === "string" && value.startsWith("data:image/");
 }
 
+function isOversizedImageReference(value) {
+    return isDataImageUrl(value) && value.length > MAX_IMAGE_DATA_URL_LENGTH;
+}
+
+function normalizeImageReference(value) {
+    const normalized = (value || "").toString().trim();
+    if (!normalized) return OFFLINE_PLACEHOLDER_IMAGE;
+    if (isOversizedImageReference(normalized)) return OFFLINE_PLACEHOLDER_IMAGE;
+    return normalized;
+}
+
 function makeStorageFriendlyNews(newsList) {
     const trimmed = (newsList || []).slice(0, MAX_OFFLINE_NEWS_ITEMS);
     return trimmed.map((item, index) => {
-        if (index < 3 || !isDataImageUrl(item.image)) return item;
+        if (isOversizedImageReference(item.image)) {
+            return { ...item, image: OFFLINE_PLACEHOLDER_IMAGE };
+        }
+        if (index < 3) return item;
         return { ...item, image: OFFLINE_PLACEHOLDER_IMAGE };
     });
 }
@@ -66,7 +80,7 @@ function saveUserNewsWithFallback(newsList) {
 
     const noDataImages = (newsList || [])
         .slice(0, MAX_OFFLINE_NEWS_ITEMS)
-        .map(item => isDataImageUrl(item.image) ? { ...item, image: OFFLINE_PLACEHOLDER_IMAGE } : item);
+        .map(item => isOversizedImageReference(item.image) ? { ...item, image: OFFLINE_PLACEHOLDER_IMAGE } : item);
     if (saveUserNewsSafe(noDataImages)) {
         return { saved: true, list: noDataImages, downgradedImage: true };
     }
@@ -78,7 +92,46 @@ function saveUserNewsWithFallback(newsList) {
         return { saved: true, list: compactList, downgradedImage: true };
     }
 
+    const emergencyOneItem = (newsList || [])
+        .slice(0, 1)
+        .map(item => ({
+            ...item,
+            description: String(item.description || "").slice(0, 300),
+            image: OFFLINE_PLACEHOLDER_IMAGE
+        }));
+    if (saveUserNewsSafe(emergencyOneItem)) {
+        return { saved: true, list: emergencyOneItem, downgradedImage: true };
+    }
+
     return { saved: false, list: newsList, downgradedImage: false };
+}
+
+function renderAdminNewsList(userNews) {
+    const newsList = document.getElementById("admin-news-list");
+
+    if (userNews.length === 0) {
+        if (editingNewsId) resetNewsFormToCreateMode();
+        newsList.innerHTML = "<p style=\"color: #999;\">এখনও কোনো খবর পোস্ট হয়নি</p>";
+        return;
+    }
+
+    newsList.innerHTML = userNews.map(item => `
+        <div class="admin-news-item">
+            <div class="admin-news-header">
+                <h4>${item.title}</h4>
+                <div class="admin-news-actions">
+                    <button onclick="beginEditNews('${item.id}')" class="btn-edit">এডিট</button>
+                    <button onclick="deleteNews('${item.id}')" class="btn-delete">মুছুন</button>
+                </div>
+            </div>
+            <p class="admin-news-meta">
+                <strong>ক্যাটাগরি:</strong> ${item.category} | 
+                <strong>তারিখ:</strong> ${item.date} | 
+                <strong>লেখক:</strong> ${item.author}
+            </p>
+            <p>${item.description.substring(0, 100)}...</p>
+        </div>
+    `).join("");
 }
 
 function compressImageFile(file) {
@@ -267,15 +320,19 @@ setCreateMode();
 
 let uploadedImageUrl = "";
 const imageFile = document.getElementById("image-file");
+imageFile.addEventListener("click", () => {
+    // Allow selecting the same image again on mobile.
+    imageFile.value = "";
+});
+
 imageFile.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (file) {
         try {
             uploadedImageUrl = await compressImageFile(file);
             if (uploadedImageUrl.length > MAX_IMAGE_DATA_URL_LENGTH) {
-                uploadedImageUrl = "";
-                if (imageFile) imageFile.value = "";
-                alert("ছবিটি এখনও অনেক বড়। অনুগ্রহ করে ছোট ছবি দিন বা image URL ব্যবহার করুন।");
+                uploadedImageUrl = OFFLINE_PLACEHOLDER_IMAGE;
+                alert("ছবিটি খুব বড় হওয়ায় পোস্টে placeholder ছবি ব্যবহার হবে।");
                 return;
             }
             document.getElementById("image-url").value = "";
@@ -298,7 +355,7 @@ newsForm.addEventListener("submit", async (e) => {
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
     const category = document.getElementById("category").value;
-    const imageUrl = uploadedImageUrl || document.getElementById("image-url").value.trim();
+    const imageUrl = normalizeImageReference(uploadedImageUrl || document.getElementById("image-url").value);
     const author = document.getElementById("author").value || "M TV";
     
     if (!title || !description || !category) {
@@ -306,7 +363,7 @@ newsForm.addEventListener("submit", async (e) => {
         return;
     }
     
-    const fallbackImage = imageUrl || OFFLINE_PLACEHOLDER_IMAGE;
+    const fallbackImage = imageUrl;
     const basePayload = {
         title: title,
         description: description,
@@ -346,13 +403,10 @@ newsForm.addEventListener("submit", async (e) => {
             userNews = cacheSaveResult.list;
             currentAdminNews = userNews;
 
-            if (!updatedByApi && !cacheSaveResult.saved) {
-                alert("এডিট সেভ হয়নি। server/API এবং storage check করুন।");
-                return;
-            }
-
             successMessage = updatedByApi
                 ? "খবর এডিট সফল হয়েছে! সব ডিভাইসে আপডেট দেখাবে।"
+                : !cacheSaveResult.saved
+                    ? "খবর এডিট হয়েছে, কিন্তু browser storage বন্ধ/সীমাবদ্ধ। পেজ refresh দিলে হারাতে পারে।"
                 : cacheSaveResult.downgradedImage
                     ? "খবর এডিট হয়েছে, তবে স্টোরেজ সীমার কারণে কিছু পুরোনো ছবির বদলে placeholder রাখা হয়েছে।"
                     : "খবর এডিট হয়েছে, কিন্তু server/API অফ থাকায় শুধু এই ডিভাইসে আপডেট দেখাবে।";
@@ -374,13 +428,10 @@ newsForm.addEventListener("submit", async (e) => {
             userNews = cacheSaveResult.list;
             currentAdminNews = userNews;
 
-            if (!createdByApi && !cacheSaveResult.saved) {
-                alert("খবর পোস্ট হয়নি। ছবি খুব বড় হতে পারে, image URL দিন বা ছোট ছবি ব্যবহার করুন।");
-                return;
-            }
-
             successMessage = createdByApi
                 ? "খবর সফলভাবে পোস্ট হয়েছে! এখন ফোন ও ল্যাপটপে দেখা যাবে।"
+                : !cacheSaveResult.saved
+                    ? "খবর পোস্ট হয়েছে, কিন্তু browser storage বন্ধ/সীমাবদ্ধ। পেজ refresh দিলে হারাতে পারে।"
                 : cacheSaveResult.downgradedImage
                     ? "খবর পোস্ট হয়েছে। স্টোরেজ সীমার কারণে কিছু পুরোনো ছবির বদলে placeholder রাখা হয়েছে।"
                     : "খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।";
@@ -388,7 +439,11 @@ newsForm.addEventListener("submit", async (e) => {
 
         alert(successMessage);
         resetNewsFormToCreateMode();
-        await loadRecentNews();
+        if (typeof successMessage === "string" && successMessage.includes("refresh দিলে হারাতে পারে")) {
+            renderAdminNewsList(currentAdminNews);
+        } else {
+            await loadRecentNews();
+        }
         
         // Reload news on main page if available
         if (typeof loadNews === 'function') {
@@ -401,8 +456,6 @@ newsForm.addEventListener("submit", async (e) => {
 });
 
 async function loadRecentNews() {
-    const newsList = document.getElementById("admin-news-list");
-
     const apiNews = await loadNewsFromApi();
     let userNews;
 
@@ -419,30 +472,7 @@ async function loadRecentNews() {
     }
     
     currentAdminNews = userNews;
-
-    if (userNews.length === 0) {
-        if (editingNewsId) resetNewsFormToCreateMode();
-        newsList.innerHTML = "<p style=\"color: #999;\">এখনও কোনো খবর পোস্ট হয়নি</p>";
-        return;
-    }
-    
-    newsList.innerHTML = userNews.map(item => `
-        <div class="admin-news-item">
-            <div class="admin-news-header">
-                <h4>${item.title}</h4>
-                <div class="admin-news-actions">
-                    <button onclick="beginEditNews('${item.id}')" class="btn-edit">এডিট</button>
-                    <button onclick="deleteNews('${item.id}')" class="btn-delete">মুছুন</button>
-                </div>
-            </div>
-            <p class="admin-news-meta">
-                <strong>ক্যাটাগরি:</strong> ${item.category} | 
-                <strong>তারিখ:</strong> ${item.date} | 
-                <strong>লেখক:</strong> ${item.author}
-            </p>
-            <p>${item.description.substring(0, 100)}...</p>
-        </div>
-    `).join("");
+    renderAdminNewsList(userNews);
 }
 
 function beginEditNews(id) {

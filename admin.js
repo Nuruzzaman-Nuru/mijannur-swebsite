@@ -22,6 +22,7 @@ const OFFLINE_PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+I
 let editingNewsId = null;
 let editingOriginalDate = null;
 let currentAdminNews = [];
+let latestApiErrorMessage = "";
 
 function getParsedUserNews() {
     try {
@@ -204,7 +205,43 @@ async function loadNewsFromApi() {
     }
 }
 
+async function readApiErrorMessage(response) {
+    try {
+        const payload = await response.json();
+        if (payload && typeof payload === "object") {
+            const combined = [payload.error, payload.details].filter(Boolean).join(" | ");
+            if (combined) return combined;
+        }
+    } catch (error) {
+        // Ignore JSON parsing issues.
+    }
+
+    try {
+        const text = await response.text();
+        if (text && text.trim()) return text.trim();
+    } catch (error) {
+        // Ignore text parsing issues.
+    }
+
+    return `HTTP_${response.status}`;
+}
+
+function getApiPersistenceHint() {
+    const message = (latestApiErrorMessage || "").toLowerCase();
+    const likelyStorageIssue = message.includes("erofs")
+        || message.includes("read-only")
+        || message.includes("permission")
+        || message.includes("github_write_failed")
+        || message.includes("failed to handle news request");
+
+    if (!likelyStorageIssue) return "";
+
+    return "Vercel এ post persist করতে Project Settings -> Environment Variables এ GITHUB_OWNER, GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH, GITHUB_NEWS_FILE সেট করে redeploy দিন।";
+}
+
 async function createNewsInApi(newsPayload) {
+    latestApiErrorMessage = "";
+
     try {
         const response = await fetch(API_NEWS_ENDPOINT, {
             method: "POST",
@@ -212,14 +249,21 @@ async function createNewsInApi(newsPayload) {
             body: JSON.stringify(newsPayload)
         });
 
-        if (!response.ok) return null;
+        if (!response.ok) {
+            latestApiErrorMessage = await readApiErrorMessage(response);
+            return null;
+        }
+
         return await response.json();
     } catch (error) {
+        latestApiErrorMessage = error && error.message ? error.message : "network_error";
         return null;
     }
 }
 
 async function updateNewsInApi(id, newsPayload) {
+    latestApiErrorMessage = "";
+
     try {
         const response = await fetch(`${API_NEWS_ENDPOINT}/${encodeURIComponent(id)}`, {
             method: "PUT",
@@ -227,9 +271,14 @@ async function updateNewsInApi(id, newsPayload) {
             body: JSON.stringify(newsPayload)
         });
 
-        if (!response.ok) return null;
+        if (!response.ok) {
+            latestApiErrorMessage = await readApiErrorMessage(response);
+            return null;
+        }
+
         return await response.json();
     } catch (error) {
+        latestApiErrorMessage = error && error.message ? error.message : "network_error";
         return null;
     }
 }
@@ -380,6 +429,7 @@ newsForm.addEventListener("submit", async (e) => {
 
         let effectiveNews = null;
         let successMessage = "";
+        let syncedWithApi = false;
 
         if (editingNewsId) {
             const existing = currentAdminNews.find(item => String(item.id) === String(editingNewsId));
@@ -389,6 +439,7 @@ newsForm.addEventListener("submit", async (e) => {
             };
 
             const updatedByApi = await updateNewsInApi(editingNewsId, updatePayload);
+            syncedWithApi = Boolean(updatedByApi);
             effectiveNews = updatedByApi || { ...(existing || {}), ...updatePayload, id: editingNewsId };
 
             userNews = userNews.map(item =>
@@ -418,6 +469,7 @@ newsForm.addEventListener("submit", async (e) => {
             };
 
             const createdByApi = await createNewsInApi(newNews);
+            syncedWithApi = Boolean(createdByApi);
             effectiveNews = createdByApi || newNews;
 
             // Update local cache (fallback/offline + quick UI refresh)
@@ -435,6 +487,11 @@ newsForm.addEventListener("submit", async (e) => {
                 : cacheSaveResult.downgradedImage
                     ? "খবর পোস্ট হয়েছে। স্টোরেজ সীমার কারণে কিছু পুরোনো ছবির বদলে placeholder রাখা হয়েছে।"
                     : "খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।";
+        }
+
+        const apiHint = !syncedWithApi ? getApiPersistenceHint() : "";
+        if (apiHint) {
+            successMessage = `${successMessage}\n\n${apiHint}`;
         }
 
         alert(successMessage);

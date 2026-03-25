@@ -8,8 +8,19 @@ function isAdminPostedNews(item) {
 
     const postedBy = (item.postedBy || '').toString().trim().toLowerCase();
     const id = (item.id || '').toString();
+    const hasRequiredContent = Boolean(
+        String(item.title || '').trim() &&
+        String(item.description || '').trim()
+    );
 
-    return postedBy === 'admin' || postedBy === 'adminmijanur' || id.startsWith('admin_');
+    if (!hasRequiredContent) return false;
+
+    return (
+        postedBy === 'admin' ||
+        postedBy === 'adminmijanur' ||
+        id.startsWith('admin_') ||
+        postedBy === ''
+    );
 }
 
 function getAdminOnlyNews(newsList) {

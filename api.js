@@ -58,7 +58,7 @@ app.post('/api/news', (req, res) => {
         image: req.body.image,
         date: req.body.date || new Date().toISOString().split('T')[0],
         author: req.body.author,
-        postedBy: req.body.postedBy
+        postedBy: req.body.postedBy || 'adminmijanur'
     };
     
     db.news.unshift(newNews);

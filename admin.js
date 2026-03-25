@@ -14,6 +14,11 @@ const ADMIN_PASSWORD = "12345678";
 const API_NEWS_ENDPOINT = "/api/news";
 const MAX_IMAGE_WIDTH = 1280;
 const IMAGE_QUALITY = 0.75;
+const MIN_IMAGE_QUALITY = 0.45;
+const IMAGE_QUALITY_STEP = 0.1;
+const MAX_IMAGE_DATA_URL_LENGTH = 350000;
+const MAX_OFFLINE_NEWS_ITEMS = 25;
+const OFFLINE_PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image";
 let editingNewsId = null;
 let editingOriginalDate = null;
 let currentAdminNews = [];
@@ -35,6 +40,45 @@ function saveUserNewsSafe(newsList) {
         console.warn("Could not save all news to localStorage:", error);
         return false;
     }
+}
+
+function isDataImageUrl(value) {
+    return typeof value === "string" && value.startsWith("data:image/");
+}
+
+function makeStorageFriendlyNews(newsList) {
+    const trimmed = (newsList || []).slice(0, MAX_OFFLINE_NEWS_ITEMS);
+    return trimmed.map((item, index) => {
+        if (index < 3 || !isDataImageUrl(item.image)) return item;
+        return { ...item, image: OFFLINE_PLACEHOLDER_IMAGE };
+    });
+}
+
+function saveUserNewsWithFallback(newsList) {
+    if (saveUserNewsSafe(newsList)) {
+        return { saved: true, list: newsList, downgradedImage: false };
+    }
+
+    const optimized = makeStorageFriendlyNews(newsList);
+    if (saveUserNewsSafe(optimized)) {
+        return { saved: true, list: optimized, downgradedImage: true };
+    }
+
+    const noDataImages = (newsList || [])
+        .slice(0, MAX_OFFLINE_NEWS_ITEMS)
+        .map(item => isDataImageUrl(item.image) ? { ...item, image: OFFLINE_PLACEHOLDER_IMAGE } : item);
+    if (saveUserNewsSafe(noDataImages)) {
+        return { saved: true, list: noDataImages, downgradedImage: true };
+    }
+
+    const compactList = (newsList || [])
+        .slice(0, 12)
+        .map(item => ({ ...item, image: OFFLINE_PLACEHOLDER_IMAGE }));
+    if (saveUserNewsSafe(compactList)) {
+        return { saved: true, list: compactList, downgradedImage: true };
+    }
+
+    return { saved: false, list: newsList, downgradedImage: false };
 }
 
 function compressImageFile(file) {
@@ -59,8 +103,35 @@ function compressImageFile(file) {
                     return;
                 }
 
-                context.drawImage(image, 0, 0, width, height);
-                resolve(canvas.toDataURL("image/jpeg", IMAGE_QUALITY));
+                const downscaleSteps = [1, 0.85, 0.7, 0.55];
+                let bestDataUrl = "";
+
+                for (const step of downscaleSteps) {
+                    const nextWidth = Math.max(1, Math.round(width * step));
+                    const nextHeight = Math.max(1, Math.round(height * step));
+                    canvas.width = nextWidth;
+                    canvas.height = nextHeight;
+                    context.clearRect(0, 0, nextWidth, nextHeight);
+                    context.drawImage(image, 0, 0, nextWidth, nextHeight);
+
+                    for (let quality = IMAGE_QUALITY; quality >= MIN_IMAGE_QUALITY; quality -= IMAGE_QUALITY_STEP) {
+                        const roundedQuality = Math.max(MIN_IMAGE_QUALITY, Number(quality.toFixed(2)));
+                        const compressedData = canvas.toDataURL("image/jpeg", roundedQuality);
+                        bestDataUrl = compressedData;
+
+                        if (compressedData.length <= MAX_IMAGE_DATA_URL_LENGTH) {
+                            resolve(compressedData);
+                            return;
+                        }
+                    }
+                }
+
+                if (!bestDataUrl) {
+                    reject(new Error("image_compress_failed"));
+                    return;
+                }
+
+                resolve(bestDataUrl);
             };
             image.src = reader.result;
         };
@@ -201,6 +272,12 @@ imageFile.addEventListener("change", async (e) => {
     if (file) {
         try {
             uploadedImageUrl = await compressImageFile(file);
+            if (uploadedImageUrl.length > MAX_IMAGE_DATA_URL_LENGTH) {
+                uploadedImageUrl = "";
+                if (imageFile) imageFile.value = "";
+                alert("ছবিটি এখনও অনেক বড়। অনুগ্রহ করে ছোট ছবি দিন বা image URL ব্যবহার করুন।");
+                return;
+            }
             document.getElementById("image-url").value = "";
         } catch (error) {
             uploadedImageUrl = "";
@@ -221,7 +298,7 @@ newsForm.addEventListener("submit", async (e) => {
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
     const category = document.getElementById("category").value;
-    const imageUrl = uploadedImageUrl || document.getElementById("image-url").value;
+    const imageUrl = uploadedImageUrl || document.getElementById("image-url").value.trim();
     const author = document.getElementById("author").value || "M TV";
     
     if (!title || !description || !category) {
@@ -229,7 +306,7 @@ newsForm.addEventListener("submit", async (e) => {
         return;
     }
     
-    const fallbackImage = imageUrl || "https://via.placeholder.com/300x200?text=No+Image";
+    const fallbackImage = imageUrl || OFFLINE_PLACEHOLDER_IMAGE;
     const basePayload = {
         title: title,
         description: description,
@@ -265,15 +342,20 @@ newsForm.addEventListener("submit", async (e) => {
                 userNews.unshift(effectiveNews);
             }
 
-            const cacheSaved = saveUserNewsSafe(userNews);
-            if (!updatedByApi && !cacheSaved) {
+            const cacheSaveResult = saveUserNewsWithFallback(userNews);
+            userNews = cacheSaveResult.list;
+            currentAdminNews = userNews;
+
+            if (!updatedByApi && !cacheSaveResult.saved) {
                 alert("এডিট সেভ হয়নি। server/API এবং storage check করুন।");
                 return;
             }
 
             successMessage = updatedByApi
                 ? "খবর এডিট সফল হয়েছে! সব ডিভাইসে আপডেট দেখাবে।"
-                : "খবর এডিট হয়েছে, কিন্তু server/API অফ থাকায় শুধু এই ডিভাইসে আপডেট দেখাবে।";
+                : cacheSaveResult.downgradedImage
+                    ? "খবর এডিট হয়েছে, তবে স্টোরেজ সীমার কারণে কিছু পুরোনো ছবির বদলে placeholder রাখা হয়েছে।"
+                    : "খবর এডিট হয়েছে, কিন্তু server/API অফ থাকায় শুধু এই ডিভাইসে আপডেট দেখাবে।";
         } else {
             const newNews = {
                 id: "admin_" + Date.now(),
@@ -288,15 +370,20 @@ newsForm.addEventListener("submit", async (e) => {
             userNews = userNews.filter(item => String(item.id) !== String(effectiveNews.id));
             userNews.unshift(effectiveNews);
 
-            const cacheSaved = saveUserNewsSafe(userNews);
-            if (!createdByApi && !cacheSaved) {
+            const cacheSaveResult = saveUserNewsWithFallback(userNews);
+            userNews = cacheSaveResult.list;
+            currentAdminNews = userNews;
+
+            if (!createdByApi && !cacheSaveResult.saved) {
                 alert("খবর পোস্ট হয়নি। ছবি খুব বড় হতে পারে, image URL দিন বা ছোট ছবি ব্যবহার করুন।");
                 return;
             }
 
             successMessage = createdByApi
                 ? "খবর সফলভাবে পোস্ট হয়েছে! এখন ফোন ও ল্যাপটপে দেখা যাবে।"
-                : "খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।";
+                : cacheSaveResult.downgradedImage
+                    ? "খবর পোস্ট হয়েছে। স্টোরেজ সীমার কারণে কিছু পুরোনো ছবির বদলে placeholder রাখা হয়েছে।"
+                    : "খবর পোস্ট হয়েছে, কিন্তু server/API চালু নেই বলে শুধু এই ডিভাইসে দেখা যাবে।";
         }
 
         alert(successMessage);

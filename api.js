@@ -51,7 +51,7 @@ app.get('/api/news/:id', (req, res) => {
 app.post('/api/news', (req, res) => {
     const db = readDatabase();
     const newNews = {
-        id: Date.now(),
+        id: req.body.id || `admin_${Date.now()}`,
         title: req.body.title,
         description: req.body.description,
         category: req.body.category,

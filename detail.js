@@ -9,7 +9,7 @@ function isAdminPostedNews(item) {
     const postedBy = (item.postedBy || '').toString().trim().toLowerCase();
     const id = (item.id || '').toString();
 
-    return postedBy === 'admin' || id.startsWith('admin_');
+    return postedBy === 'admin' || postedBy === 'adminmijanur' || id.startsWith('admin_');
 }
 
 function getAdminOnlyNews(newsList) {

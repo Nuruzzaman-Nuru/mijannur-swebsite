@@ -8,6 +8,8 @@ const newsForm = document.getElementById("news-form");
 const formTitle = document.getElementById("admin-form-title") || document.querySelector("#admin-panel h2");
 const submitNewsBtn = document.getElementById("submit-news-btn");
 const cancelEditBtn = document.getElementById("cancel-edit-btn");
+const imageUrlInput = document.getElementById("image-url");
+const imageFile = document.getElementById("image-file");
 
 const ADMIN_USERNAME = "adminmijanur";
 const ADMIN_PASSWORD = "12345678";
@@ -23,6 +25,8 @@ let editingNewsId = null;
 let editingOriginalDate = null;
 let currentAdminNews = [];
 let latestApiErrorMessage = "";
+let pendingImageProcessing = null;
+let imageProcessingToken = 0;
 
 function getParsedUserNews() {
     try {
@@ -349,48 +353,79 @@ function setCreateMode() {
     if (formTitle) formTitle.textContent = "নিউজ পোস্ট করুন";
     if (submitNewsBtn) submitNewsBtn.textContent = "নিউজ পোস্ট করুন";
     if (cancelEditBtn) cancelEditBtn.style.display = "none";
+    syncSubmitButtonState();
 }
 
 function setEditMode() {
     if (formTitle) formTitle.textContent = "নিউজ এডিট করুন";
     if (submitNewsBtn) submitNewsBtn.textContent = "এডিট সেভ করুন";
     if (cancelEditBtn) cancelEditBtn.style.display = "block";
+    syncSubmitButtonState();
+}
+
+function syncSubmitButtonState() {
+    if (!submitNewsBtn) return;
+    submitNewsBtn.disabled = Boolean(pendingImageProcessing);
 }
 
 function resetNewsFormToCreateMode() {
     newsForm.reset();
     uploadedImageUrl = "";
-    document.getElementById("image-url").value = "";
+    if (imageUrlInput) imageUrlInput.value = "";
     if (imageFile) imageFile.value = "";
+    pendingImageProcessing = null;
+    imageProcessingToken += 1;
     setCreateMode();
 }
 
 setCreateMode();
 
 let uploadedImageUrl = "";
-const imageFile = document.getElementById("image-file");
-imageFile.addEventListener("click", () => {
-    // Allow selecting the same image again on mobile.
-    imageFile.value = "";
-});
+if (imageUrlInput) {
+    imageUrlInput.addEventListener("input", () => {
+        if (!imageUrlInput.value.trim()) return;
+        // URL ব্যবহার করলে আগের selected file image override করা হবে।
+        uploadedImageUrl = "";
+        if (imageFile) imageFile.value = "";
+    });
+}
 
-imageFile.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        try {
-            uploadedImageUrl = await compressImageFile(file);
-            if (uploadedImageUrl.length > MAX_IMAGE_DATA_URL_LENGTH) {
-                uploadedImageUrl = OFFLINE_PLACEHOLDER_IMAGE;
-                alert("ছবিটি খুব বড় হওয়ায় পোস্টে placeholder ছবি ব্যবহার হবে।");
-                return;
-            }
-            document.getElementById("image-url").value = "";
-        } catch (error) {
+if (imageFile) {
+    imageFile.addEventListener("click", () => {
+        // Allow selecting the same image again on mobile.
+        imageFile.value = "";
+    });
+
+    imageFile.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) {
             uploadedImageUrl = "";
-            alert("ছবি প্রসেস করা যায়নি। ছোট ছবি দিন বা image URL ব্যবহার করুন।");
+            return;
         }
-    }
-});
+
+        const token = ++imageProcessingToken;
+        pendingImageProcessing = (async () => {
+            try {
+                uploadedImageUrl = await compressImageFile(file);
+                if (uploadedImageUrl.length > MAX_IMAGE_DATA_URL_LENGTH) {
+                    uploadedImageUrl = OFFLINE_PLACEHOLDER_IMAGE;
+                    alert("ছবিটি খুব বড় হওয়ায় পোস্টে placeholder ছবি ব্যবহার হবে।");
+                    return;
+                }
+                if (imageUrlInput) imageUrlInput.value = "";
+            } catch (error) {
+                uploadedImageUrl = "";
+                alert("ছবি প্রসেস করা যায়নি। ছোট ছবি দিন বা image URL ব্যবহার করুন।");
+            }
+        })().finally(() => {
+            if (token !== imageProcessingToken) return;
+            pendingImageProcessing = null;
+            syncSubmitButtonState();
+        });
+
+        syncSubmitButtonState();
+    });
+}
 
 if (cancelEditBtn) {
     cancelEditBtn.addEventListener("click", () => {
@@ -400,11 +435,16 @@ if (cancelEditBtn) {
 
 newsForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    if (pendingImageProcessing) {
+        alert("ছবি প্রসেস হচ্ছে, কয়েক সেকেন্ড অপেক্ষা করুন...");
+        await pendingImageProcessing;
+    }
     
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
     const category = document.getElementById("category").value;
-    const imageUrl = normalizeImageReference(uploadedImageUrl || document.getElementById("image-url").value);
+    const imageUrl = normalizeImageReference(uploadedImageUrl || (imageUrlInput ? imageUrlInput.value : ""));
     const author = document.getElementById("author").value || "M TV";
     
     if (!title || !description || !category) {
@@ -547,9 +587,11 @@ function beginEditNews(id) {
     document.getElementById("description").value = newsItem.description || "";
     document.getElementById("category").value = newsItem.category || "";
     document.getElementById("author").value = newsItem.author || "M TV";
-    document.getElementById("image-url").value = newsItem.image && /^https?:\/\//i.test(newsItem.image)
-        ? newsItem.image
-        : "";
+    if (imageUrlInput) {
+        imageUrlInput.value = newsItem.image && /^https?:\/\//i.test(newsItem.image)
+            ? newsItem.image
+            : "";
+    }
     if (imageFile) imageFile.value = "";
 
     setEditMode();

@@ -4,8 +4,12 @@
     const categoryList = document.querySelector(".category-menu ul");
 
     if (!categoryList) return;
+    if (categoryList.dataset.dropdownReady === "true") return;
+    categoryList.dataset.dropdownReady = "true";
 
-    const categoryItems = Array.from(categoryList.querySelectorAll(":scope > li"));
+    const categoryItems = Array.from(categoryList.children).filter((item) => {
+        return item.tagName === "LI" && !item.classList.contains("category-more-item");
+    });
     if (categoryItems.length <= VISIBLE_CATEGORY_COUNT) return;
 
     const hiddenItems = categoryItems.slice(VISIBLE_CATEGORY_COUNT);

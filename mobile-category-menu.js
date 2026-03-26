@@ -1,6 +1,6 @@
 (() => {
     const MOBILE_BREAKPOINT = 768;
-    const VISIBLE_CATEGORY_COUNT = 99;
+    const VISIBLE_CATEGORY_COUNT = 0;
     const categoryList = document.querySelector(".category-menu ul");
 
     if (!categoryList) return;
@@ -15,7 +15,7 @@
     moreItem.className = "category-more-item";
     moreItem.innerHTML = `
         <button type="button" class="category-more-toggle" aria-expanded="false">
-            আরও
+            ক্যাটাগরি
             <i class="fas fa-chevron-down" aria-hidden="true"></i>
         </button>
         <div class="category-more-dropdown" role="menu"></div>

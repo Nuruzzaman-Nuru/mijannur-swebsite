@@ -1,9 +1,10 @@
 (() => {
     const MOBILE_BREAKPOINT = 768;
     const VISIBLE_CATEGORY_COUNT = 0;
+    const categoryMenu = document.querySelector(".category-menu");
     const categoryList = document.querySelector(".category-menu ul");
 
-    if (!categoryList) return;
+    if (!categoryMenu || !categoryList) return;
     if (categoryList.dataset.dropdownReady === "true") return;
     categoryList.dataset.dropdownReady = "true";
 
@@ -44,11 +45,13 @@
     function closeMoreDropdown() {
         moreItem.classList.remove("is-open");
         toggleButton.setAttribute("aria-expanded", "false");
+        categoryMenu.classList.remove("dropdown-open");
     }
 
     function openMoreDropdown() {
         moreItem.classList.add("is-open");
         toggleButton.setAttribute("aria-expanded", "true");
+        categoryMenu.classList.add("dropdown-open");
     }
 
     function syncForViewport() {

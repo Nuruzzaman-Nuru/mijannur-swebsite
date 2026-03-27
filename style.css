@@ -163,6 +163,12 @@ header {
     overflow-x: auto;
 }
 
+.category-menu.dropdown-open {
+    overflow: visible;
+    position: relative;
+    z-index: 1300;
+}
+
 .category-menu ul {
     display: flex;
     list-style: none;

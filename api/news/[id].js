@@ -1,7 +1,9 @@
 "use strict";
 
 const {
+    NEWS_TTL_HOURS,
     normalizeNewsItem,
+    pruneExpiredNews,
     normalizeDatabaseShape,
     loadNewsStore,
     saveNewsStore
@@ -50,14 +52,22 @@ module.exports = async (req, res) => {
     try {
         const { db, meta } = await loadNewsStore();
         const normalizedDb = normalizeDatabaseShape(db);
-        const index = normalizedDb.news.findIndex(item => String(item.id) === id);
+        const pruned = pruneExpiredNews(normalizedDb);
+        const workingDb = pruned.db;
+
+        if (req.method === "GET" && pruned.changed) {
+            const commitMessage = `Auto-remove expired news older than ${NEWS_TTL_HOURS}h`;
+            await saveNewsStore(workingDb, meta, commitMessage);
+        }
+
+        const index = workingDb.news.findIndex(item => String(item.id) === id);
 
         if (req.method === "GET") {
             if (index === -1) {
                 res.status(404).json({ error: "News not found" });
                 return;
             }
-            res.status(200).json(normalizedDb.news[index]);
+            res.status(200).json(workingDb.news[index]);
             return;
         }
 
@@ -68,15 +78,15 @@ module.exports = async (req, res) => {
             }
 
             const incoming = getRequestBody(req);
-            const updated = normalizeNewsItem({ ...incoming, id }, normalizedDb.news[index]);
+            const updated = normalizeNewsItem({ ...incoming, id }, workingDb.news[index]);
 
             if (!updated.title || !updated.description || !updated.category) {
                 res.status(400).json({ error: "title, description, category are required" });
                 return;
             }
 
-            normalizedDb.news[index] = updated;
-            await saveNewsStore(normalizedDb, meta, `Update news ${id}`);
+            workingDb.news[index] = updated;
+            await saveNewsStore(workingDb, meta, `Update news ${id}`);
             res.status(200).json(updated);
             return;
         }
@@ -87,10 +97,10 @@ module.exports = async (req, res) => {
                 return;
             }
 
-            const deleted = normalizedDb.news[index];
-            normalizedDb.news.splice(index, 1);
+            const deleted = workingDb.news[index];
+            workingDb.news.splice(index, 1);
 
-            await saveNewsStore(normalizedDb, meta, `Delete news ${id}`);
+            await saveNewsStore(workingDb, meta, `Delete news ${id}`);
             res.status(200).json({ success: true, deleted });
             return;
         }

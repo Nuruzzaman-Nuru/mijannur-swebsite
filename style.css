@@ -1743,17 +1743,6 @@ footer {
     box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
 }
 
-.btn-pdf {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.btn-pdf:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
-}
-
 .detail-actions {
     display: flex;
     gap: 1rem;
@@ -1906,14 +1895,10 @@ footer {
     .mobile-nav-toggle,
     .search-bar,
     .action-buttons,
-    .share-buttons,
     .detail-actions,
     #print-index-btn,
     #print-news-btn,
     #print-detail-btn,
-    #pdf-index-btn,
-    #pdf-news-btn,
-    #pdf-detail-btn,
     .sidebar,
     .detail-sidebar,
     .ad-banner,

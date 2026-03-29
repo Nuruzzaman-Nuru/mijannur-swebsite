@@ -1886,14 +1886,14 @@ footer {
         margin: 0;
         padding: 0;
         background-color: #f4f4f4;
-        color: #333;
+        color: white;
     }
 
     body {
         font-size: 11pt;
         line-height: 1.7;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #2c3e50;
+        color: white;
     }
 
     /* Hide unwanted elements */
@@ -1980,12 +1980,12 @@ footer {
         margin-bottom: 0;
         page-break-after: always;
         break-after: page;
-        background: #f8f9fa;
+        background: #2c3e50;
     }
 
     .featured-section .news-banner-title {
         font-size: 14pt;
-        color: #2c3e50;
+        color: white;
         font-weight: bold;
     }
 
@@ -1995,10 +1995,14 @@ footer {
     }
 
     .featured-section .news-banner-meta {
-        background: #e8f4f8;
-        padding: 6pt;
+        background: transparent;
+        padding: 6pt 0;
         border-radius: 3pt;
         margin: 10pt 0;
+    }
+
+    .featured-section .news-banner-meta {
+        color: white;
     }
 
     /* News section */
@@ -2035,12 +2039,13 @@ footer {
         page-break-inside: avoid;
         page-break-after: always;
         margin-bottom: 0;
-        background: white;
-        border: 2pt solid #bdc3c7;
+        background: #2c3e50;
+        border: 2pt solid #1a252f;
         padding: 20pt;
         border-radius: 5pt;
         min-height: 80%;
-        box-shadow: 0 2pt 4pt rgba(0,0,0,0.1);
+        box-shadow: 0 2pt 4pt rgba(0,0,0,0.3);
+        color: white;
     }
 
     .news-banner-media {
@@ -2091,17 +2096,17 @@ footer {
     .news-banner-date,
     .news-banner-author,
     .channel-badge {
-        color: #2c3e50;
+        color: white;
         font-size: 9pt;
         font-weight: 500;
     }
 
     .channel-badge {
-        background-color: #ecf0f1;
+        background-color: rgba(255, 255, 255, 0.2);
         padding: 2pt 8pt;
         border-radius: 3pt;
-        color: #2c3e50;
-        border: 1pt solid #bdc3c7;
+        color: white;
+        border: 1pt solid rgba(255, 255, 255, 0.4);
     }
 
     .news-modern-title,
@@ -2109,7 +2114,7 @@ footer {
     .news-banner-title {
         font-size: 13pt;
         font-weight: bold;
-        color: #2c3e50;
+        color: white;
         margin: 10pt 0;
         page-break-after: avoid;
         break-after: avoid;
@@ -2119,21 +2124,21 @@ footer {
     h1, h2, h3 {
         font-size: 13pt;
         font-weight: bold;
-        color: #2c3e50;
+        color: white;
         margin: 10pt 0;
         page-break-after: avoid;
     }
 
     .detail-title {
         font-size: 14pt;
-        color: #2c3e50;
+        color: white;
     }
 
     .news-modern-meta,
     .detail-meta,
     .news-meta {
         font-size: 9pt;
-        color: #34495e;
+        color: #ecf0f1;
         margin: 5pt 0;
         page-break-after: avoid;
         font-weight: 500;
@@ -2143,7 +2148,7 @@ footer {
     .detail-description,
     p {
         font-size: 11pt;
-        color: #2c3e50;
+        color: white;
         line-height: 1.6;
         margin: 8pt 0;
     }
@@ -2166,14 +2171,16 @@ footer {
         display: block !important;
         width: 100%;
         padding: 0;
-        background: white;
+        background: #2c3e50;
         page-break-inside: avoid;
         break-inside: avoid;
+        color: white;
     }
 
     .detail-header {
         page-break-after: avoid;
         margin-bottom: 12pt;
+        color: white;
     }
 
     .detail-category {
@@ -2185,14 +2192,16 @@ footer {
         margin: 0 0 10pt 0;
         border-radius: 3pt;
         font-weight: bold;
+        box-shadow: 0 2pt 4pt rgba(0,0,0,0.3);
     }
 
     .detail-image-wrapper {
         margin: 12pt 0;
         page-break-inside: avoid;
         break-inside: avoid;
-        border: 1pt solid #ddd;
+        border: 2pt solid rgba(255, 255, 255, 0.3);
         padding: 8pt;
+        background: rgba(0, 0, 0, 0.2);
     }
 
     /* Footer */

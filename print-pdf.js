@@ -1,5 +1,19 @@
 // Print and PDF functionality for news portal
 
+// Initialize print/PDF buttons for index page
+function initializeIndexPrintPDF() {
+    const printBtn = document.getElementById('print-index-btn');
+    const pdfBtn = document.getElementById('pdf-index-btn');
+    
+    if (printBtn) {
+        printBtn.addEventListener('click', printNewsList);
+    }
+    
+    if (pdfBtn) {
+        pdfBtn.addEventListener('click', downloadNewsListPDF);
+    }
+}
+
 // Initialize print/PDF buttons for news list page
 function initializeNewsPrintPDF() {
     const printBtn = document.getElementById('print-news-btn');

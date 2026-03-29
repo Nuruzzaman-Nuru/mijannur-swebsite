@@ -124,18 +124,19 @@ header {
     display: flex;
     list-style: none;
     gap: 1.5rem;
+    color: #ffffff !important;
 }
 
 .nav-links a {
-    color: white;
+    color: #ffffff !important;
     text-decoration: none;
     transition: color 0.3s;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
-    color: #3498db;
+    color: #3498db !important;
 }
 
 .mobile-nav-toggle {

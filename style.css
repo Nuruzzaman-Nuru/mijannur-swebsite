@@ -158,7 +158,7 @@ header {
 
 .navbar-headline-bar {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    background: #1e2d3a;
+    background: #1a2635;
 }
 
 .navbar-headline-inner {
@@ -196,6 +196,7 @@ header {
     white-space: nowrap;
     will-change: transform;
     animation: navbar-headline-scroll var(--headline-duration) linear infinite;
+    color: #ffffff !important;
 }
 
 .navbar-headline-track.is-static {
@@ -206,10 +207,10 @@ header {
 
 .navbar-headline-item,
 .navbar-headline-link {
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: none;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -217,7 +218,7 @@ header {
 
 .navbar-headline-item:hover,
 .navbar-headline-link:hover {
-    color: #3498db;
+    color: #3498db !important;
 }
 
 .navbar-headline-link {
@@ -229,8 +230,8 @@ header {
 }
 
 #navbar-headline-text {
-    color: #ffffff;
-    font-weight: 600;
+    color: #ffffff !important;
+    font-weight: 700;
 }
 
 .navbar-headline-separator {

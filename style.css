@@ -2235,36 +2235,7 @@ footer {
         background: rgba(0, 0, 0, 0.2);
     }
 
-  /* Footer */
-footer {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    padding: 20px 10px;
-    margin-top: 20px;
-    text-align: center;
-    font-size: 14px;
-    border-top: 3px solid #003f7f;
-}
-
-footer p {
-    margin: 0;
-}
-
-footer a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-footer a:hover {
-    text-decoration: underline;
-    color: #dbeafe;
-}
-    /* Links */
-    a {
-        color: #000 !important;
-        text-decoration: underline;
-    }
+  
 
     /* Images */
     img {

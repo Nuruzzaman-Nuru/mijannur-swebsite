@@ -1879,3 +1879,283 @@ footer {
         justify-content: center;
     }
 }
+
+/* ===================== PRINT STYLES ===================== */
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    body {
+        background-color: white;
+        color: #000;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    /* Show all elements during print */
+    * {
+        visibility: visible !important;
+        display: block !important;
+    }
+
+    /* Hide specific elements that shouldn't print */
+    .mobile-nav-toggle,
+    .search-bar,
+    .action-buttons,
+    .share-buttons,
+    .detail-actions,
+    #print-index-btn,
+    #print-news-btn,
+    #print-detail-btn,
+    #pdf-index-btn,
+    #pdf-news-btn,
+    #pdf-detail-btn,
+    .sidebar,
+    .detail-sidebar,
+    .ad-banner,
+    .navbar-headline-bar {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Header styling for print */
+    header {
+        background-color: #2c3e50 !important;
+        color: #000 !important;
+        page-break-after: avoid;
+        margin: 0;
+        padding: 10pt;
+        border: 1px solid #ccc;
+    }
+
+    .navbar {
+        page-break-after: avoid;
+    }
+
+    .logo-img {
+        max-height: 50pt;
+        page-break-after: avoid;
+    }
+
+    .nav-links {
+        display: flex !important;
+        page-break-after: avoid;
+    }
+
+    .nav-links a {
+        margin-right: 15pt;
+        color: #000 !important;
+        text-decoration: underline;
+    }
+
+    /* Main content */
+    main {
+        background-color: white;
+    }
+
+    .featured-section {
+        page-break-after: avoid;
+    }
+
+    .news-section {
+        width: 100% !important;
+        background-color: white;
+    }
+
+    .section-header h2 {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #000;
+        page-break-after: avoid;
+        margin: 15pt 0 10pt 0;
+        border-bottom: 3pt solid #000;
+        padding-bottom: 8pt;
+    }
+
+    .main-wrapper {
+        display: block !important;
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    /* News items */
+    .news-modern-banner,
+    .news-item,
+    .news-grid {
+        page-break-inside: avoid;
+        margin-bottom: 15pt;
+        page-break-after: auto;
+    }
+
+    .news-modern-banner {
+        display: block !important;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 8pt;
+    }
+
+    .news-banner-image,
+    .news-modern-image {
+        max-height: 200pt;
+        margin-bottom: 8pt;
+        page-break-inside: avoid;
+    }
+
+    .news-modern-title {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 5pt;
+        page-break-after: avoid;
+    }
+
+    .news-modern-meta {
+        font-size: 10pt;
+        color: #666;
+        margin-bottom: 5pt;
+    }
+
+    .news-modern-summary {
+        font-size: 11pt;
+        color: #000;
+        line-height: 1.4;
+        display: block !important;
+    }
+
+    /* Detail page */
+    .detail-wrapper {
+        display: block !important;
+        grid-template-columns: 1fr !important;
+    }
+
+    .news-detail {
+        width: 100% !important;
+        background-color: white;
+        padding: 10pt;
+        page-break-after: avoid;
+    }
+
+    .detail-header {
+        page-break-after: avoid;
+        margin-bottom: 10pt;
+    }
+
+    .detail-category {
+        display: inline-block;
+        background-color: #ddd;
+        color: #000;
+        padding: 3pt 6pt;
+        font-size: 10pt;
+        margin-bottom: 8pt;
+    }
+
+    .detail-title {
+        font-size: 16pt;
+        font-weight: bold;
+        color: #000;
+        margin: 8pt 0;
+        page-break-after: avoid;
+    }
+
+    .detail-meta {
+        font-size: 10pt;
+        color: #666;
+        page-break-after: avoid;
+    }
+
+    .detail-image-wrapper {
+        margin: 10pt 0;
+        page-break-inside: avoid;
+    }
+
+    .detail-image {
+        max-width: 100%;
+        height: auto;
+        max-height: 250pt;
+        page-break-inside: avoid;
+    }
+
+    .detail-body {
+        background-color: white;
+        padding: 8pt 0;
+    }
+
+    .detail-description {
+        font-size: 11pt;
+        line-height: 1.5;
+        color: #000;
+        text-align: justify;
+        page-break-inside: avoid;
+    }
+
+    /* Footer */
+    footer {
+        background-color: white;
+        color: #000;
+        border-top: 2pt solid #000;
+        padding: 10pt;
+        margin-top: 20pt;
+        page-break-before: avoid;
+        font-size: 10pt;
+        text-align: center;
+    }
+
+    footer p {
+        margin: 5pt 0;
+    }
+
+    footer a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    /* Links */
+    a {
+        color: #000 !important;
+        text-decoration: underline !important;
+    }
+
+    /* Images */
+    img {
+        max-width: 100%;
+        height: auto;
+        page-break-inside: avoid;
+    }
+
+    /* Tables */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        page-break-inside: avoid;
+    }
+
+    tr, td {
+        border: 1pt solid #000;
+        padding: 5pt;
+    }
+
+    /* Page breaks */
+    h1, h2, h3 {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+
+    p {
+        orphans: 2;
+        widows: 2;
+    }
+
+    /* Print sizing */
+    @page {
+        margin: 1cm;
+        size: A4;
+    }
+
+    html {
+        font-size: 12pt;
+    }
+}

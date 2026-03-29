@@ -148,7 +148,6 @@
             </small>
         </p>
     </footer>
-
     <script src="github-sync.js"></script>
     <script src="banner.js"></script>
     <script src="mobile-nav.js"></script>
@@ -163,12 +162,10 @@
             const dateStr = today.toLocaleDateString('bn-BD', options);
             document.getElementById('current-date').textContent = '📅 ' + dateStr;
         }
-
         // Filter by category
         function filterByCategory(category) {
             loadNewsByCategory(category);
         }
-
         displayDate();
     </script>
 </body>

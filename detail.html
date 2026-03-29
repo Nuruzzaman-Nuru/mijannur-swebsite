@@ -62,6 +62,14 @@
         <div class="container">
             <div class="detail-wrapper">
                 <article class="news-detail">
+                    <div class="detail-actions">
+                        <button id="print-detail-btn" class="btn btn-print" title="প্রিন্ট করুন">
+                            <i class="fas fa-print"></i> প্রিন্ট
+                        </button>
+                        <button id="pdf-detail-btn" class="btn btn-pdf" title="পিডিএফ ডাউনলোড করুন">
+                            <i class="fas fa-file-pdf"></i> পিডিএফ
+                        </button>
+                    </div>
                     <div id="detail-content">
                         <!-- খবরের বিস্তারিত এখানে লোড হবে -->
                         <p style="text-align: center; color: #666;">খবর লোড হচ্ছে...</p>
@@ -90,6 +98,13 @@
 
     <script src="mobile-nav.js"></script>
     <script src="navbar-headline.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="print-pdf.js"></script>
     <script src="detail.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDetailPrintPDF();
+        });
+    </script>
 </body>
 </html>

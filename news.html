@@ -80,7 +80,17 @@
         <div class="container">
             <div class="main-wrapper">
                 <section class="news-section">
-                    <h2>সব খবর</h2>
+                    <div class="section-header">
+                        <h2>সব খবর</h2>
+                        <div class="action-buttons">
+                            <button id="print-news-btn" class="btn btn-print" title="প্রিন্ট করুন">
+                                <i class="fas fa-print"></i> প্রিন্ট
+                            </button>
+                            <button id="pdf-news-btn" class="btn btn-pdf" title="পিডিএফ ডাউনলোড করুন">
+                                <i class="fas fa-file-pdf"></i> পিডিএফ
+                            </button>
+                        </div>
+                    </div>
                     <div id="news-container" class="news-grid">
                         <!-- News items will be loaded here -->
                     </div>
@@ -131,6 +141,8 @@
     <script src="mobile-category-menu.js"></script>
     <script src="navbar-headline.js"></script>
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="print-pdf.js"></script>
     <script>
         // Display current date
         function displayDate() {
@@ -144,8 +156,12 @@
         function filterByCategory(category) {
             loadNewsByCategory(category);
         }
-
-        displayDate();
+        
+        // Initialize print/PDF buttons for news page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNewsPrintPDF();
+            displayDate();
+        });
     </script>
 </body>
 </html>

@@ -1902,7 +1902,19 @@ footer {
     .sidebar,
     .detail-sidebar,
     .ad-banner,
-    .navbar-headline-bar {
+    .navbar-headline-bar,
+    script,
+    style,
+    noscript {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Hide any element containing font-face or CSS code */
+    *[style*="@font-face"],
+    *[style*="font-face"],
+    .font-loader,
+    .css-code {
         display: none !important;
         visibility: hidden !important;
     }

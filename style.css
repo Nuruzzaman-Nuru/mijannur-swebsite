@@ -1940,8 +1940,8 @@ footer {
     header {
         background-color: #2c3e50;
         color: white;
-        padding: 10pt;
-        margin-bottom: 15pt;
+        padding: 6pt;
+        margin-bottom: 10pt;
         page-break-after: avoid;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
@@ -1949,16 +1949,17 @@ footer {
     .navbar {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .logo-link {
         display: block !important;
-        text-align: center;
+        text-align: left;
+        margin-right: 15pt;
     }
 
     .logo-img {
-        max-width: 180pt;
+        max-width: 100pt;
         height: auto;
         display: block !important;
     }
@@ -1988,34 +1989,51 @@ footer {
     }
 
     .featured-section .news-banner {
-        border: 3pt solid #3498db;
-        padding: 15pt;
+        border: 2pt solid #3498db;
+        padding: 12pt;
         margin-bottom: 0;
         page-break-after: always;
         break-after: page;
-        background: #2c3e50;
+        background: white;
+        display: flex;
+        gap: 12pt;
+        align-items: flex-start;
+    }
+
+    .featured-section .news-banner-media {
+        flex: 0 0 100pt;
+        margin-bottom: 0;
+    }
+
+    .featured-section .news-banner-caption {
+        flex: 1;
+        padding: 0;
     }
 
     .featured-section .news-banner-title {
-        font-size: 14pt;
-        color: white;
+        font-size: 12pt;
+        color: #2c3e50;
         font-weight: bold;
+        margin: 0 0 6pt 0;
     }
 
     .featured-section .news-banner-image {
-        max-height: 220pt;
-        margin: 10pt 0;
+        max-height: 120pt;
+        margin: 0;
+        width: 100%;
     }
 
     .featured-section .news-banner-meta {
         background: transparent;
-        padding: 6pt 0;
-        border-radius: 3pt;
-        margin: 10pt 0;
+        padding: 4pt 0;
+        border-radius: 0;
+        margin: 4pt 0;
+        color: #666;
+        font-size: 8pt;
     }
 
     .featured-section .news-banner-meta {
-        color: white;
+        color: #666 !important;
     }
 
     /* News section */

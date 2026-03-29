@@ -1903,6 +1903,10 @@ footer {
     .detail-sidebar,
     .ad-banner,
     .navbar-headline-bar,
+    .category-menu,
+    .top-bar,
+    .navbar-content,
+    .nav-links,
     script,
     style,
     noscript {
@@ -1917,6 +1921,44 @@ footer {
     .css-code {
         display: none !important;
         visibility: hidden !important;
+    }
+
+    /* Show only essential header with logo */
+    .logo-link {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .logo-img {
+        display: block !important;
+        visibility: visible !important;
+        max-height: 50pt;
+    }
+
+    /* Show only news content */
+    main {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .news-section,
+    .featured-section {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .detail-wrapper {
+        display: block !important;
+    }
+
+    .news-detail {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    footer {
+        display: block !important;
+        visibility: visible !important;
     }
 
     /* Header styling for print */

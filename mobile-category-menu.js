@@ -1,6 +1,6 @@
 (() => {
     const MOBILE_BREAKPOINT = 768;
-    const VISIBLE_CATEGORY_COUNT = 0;
+    const VISIBLE_CATEGORY_COUNT = 12;
     const categoryMenu = document.querySelector(".category-menu");
     const categoryList = document.querySelector(".category-menu ul");
 

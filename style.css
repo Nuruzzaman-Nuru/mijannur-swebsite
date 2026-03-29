@@ -205,10 +205,10 @@ header {
 
 .navbar-headline-item,
 .navbar-headline-link {
-    color: #eaf4ff;
+    color: #ffffff;
     text-decoration: none;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -216,7 +216,7 @@ header {
 
 .navbar-headline-item:hover,
 .navbar-headline-link:hover {
-    color: #9bd0ff;
+    color: #3498db;
 }
 
 .navbar-headline-link {
@@ -225,6 +225,11 @@ header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#navbar-headline-text {
+    color: #ffffff;
+    font-weight: 600;
 }
 
 .navbar-headline-separator {

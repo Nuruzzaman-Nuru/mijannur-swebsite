@@ -1871,27 +1871,31 @@ footer {
 
 /* ===================== PRINT STYLES ===================== */
 @media print {
+    @page {
+        size: A4;
+        margin: 0.5cm;
+    }
+
     * {
-        background: transparent !important;
-        color: #000 !important;
         box-shadow: none !important;
         text-shadow: none !important;
     }
 
+    html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+
     body {
-        background-color: white;
-        color: #000;
-        font-size: 12pt;
-        line-height: 1.5;
+        font-size: 11pt;
+        line-height: 1.6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Show all elements during print */
-    * {
-        visibility: visible !important;
-        display: block !important;
-    }
-
-    /* Hide specific elements that shouldn't print */
+    /* Hide unwanted elements */
     .mobile-nav-toggle,
     .search-bar,
     .action-buttons,
@@ -1907,175 +1911,199 @@ footer {
     .top-bar,
     .navbar-content,
     .nav-links,
+    .social-links,
     script,
     style,
     noscript {
         display: none !important;
         visibility: hidden !important;
-    }
-    
-    /* Hide any element containing font-face or CSS code */
-    *[style*="@font-face"],
-    *[style*="font-face"],
-    .font-loader,
-    .css-code {
-        display: none !important;
-        visibility: hidden !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    /* Show only essential header with logo */
-    .logo-link {
-        display: block !important;
-        visibility: visible !important;
-    }
-
-    .logo-img {
-        display: block !important;
-        visibility: visible !important;
-        max-height: 50pt;
-    }
-
-    /* Show only news content */
-    main {
-        display: block !important;
-        visibility: visible !important;
-    }
-
-    .news-section,
-    .featured-section {
-        display: block !important;
-        visibility: visible !important;
-    }
-
-    .detail-wrapper {
-        display: block !important;
-    }
-
-    .news-detail {
-        display: block !important;
-        visibility: visible !important;
-    }
-
-    footer {
-        display: block !important;
-        visibility: visible !important;
-    }
-
-    /* Header styling for print */
+    /* Header - Keep same colors as website */
     header {
-        background-color: #2c3e50 !important;
-        color: #000 !important;
-        page-break-after: avoid;
-        margin: 0;
+        background-color: #2c3e50;
+        color: white;
         padding: 10pt;
-        border: 1px solid #ccc;
+        margin-bottom: 15pt;
+        page-break-after: avoid;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .navbar {
-        page-break-after: avoid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-link {
+        display: block !important;
+        text-align: center;
     }
 
     .logo-img {
-        max-height: 50pt;
-        page-break-after: avoid;
-    }
-
-    .nav-links {
-        display: flex !important;
-        page-break-after: avoid;
-    }
-
-    .nav-links a {
-        margin-right: 15pt;
-        color: #000 !important;
-        text-decoration: underline;
+        max-width: 180pt;
+        height: auto;
+        display: block !important;
     }
 
     /* Main content */
     main {
-        background-color: white;
+        padding: 10pt;
+        margin: 0;
+        background-color: #f4f4f4;
     }
 
-    .featured-section {
-        page-break-after: avoid;
-    }
-
-    .news-section {
-        width: 100% !important;
-        background-color: white;
-    }
-
-    .section-header h2 {
-        font-size: 18pt;
-        font-weight: bold;
-        color: #000;
-        page-break-after: avoid;
-        margin: 15pt 0 10pt 0;
-        border-bottom: 3pt solid #000;
-        padding-bottom: 8pt;
+    .container {
+        max-width: 100%;
+        padding: 0;
     }
 
     .main-wrapper {
         display: block !important;
-        grid-template-columns: 1fr !important;
-        gap: 0 !important;
     }
 
-    /* News items */
+    /* Featured section */
+    .featured-section {
+        display: block !important;
+        margin-bottom: 20pt;
+    }
+
+    /* News section */
+    .news-section {
+        display: block !important;
+        width: 100%;
+        margin-bottom: 20pt;
+    }
+
+    .news-section h2 {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #333;
+        margin: 10pt 0;
+        border-bottom: 2pt solid #2c3e50;
+        padding-bottom: 5pt;
+        page-break-after: avoid;
+    }
+
+    /* News banners and items - Keep web design colors */
     .news-modern-banner,
+    .news-banner,
     .news-item,
     .news-grid {
+        display: block !important;
         page-break-inside: avoid;
         margin-bottom: 15pt;
-        page-break-after: auto;
+        background: white;
+        border: 1pt solid #ddd;
+        padding: 10pt;
+        border-radius: 4pt;
     }
 
-    .news-modern-banner {
-        display: block !important;
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 8pt;
+    .news-banner-media {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 8pt;
     }
 
     .news-banner-image,
-    .news-modern-image {
-        max-height: 200pt;
-        margin-bottom: 8pt;
+    .news-modern-image,
+    .detail-image {
+        max-width: 100%;
+        height: auto !important;
+        max-height: 250pt;
+        display: block !important;
         page-break-inside: avoid;
+        margin: 0;
     }
 
-    .news-modern-title {
-        font-size: 14pt;
-        font-weight: bold;
-        color: #000;
+    .news-banner-corner-logo {
+        width: 50pt;
+        height: auto;
+        display: block !important;
+    }
+
+    .news-banner-caption {
+        padding: 8pt;
+    }
+
+    .news-banner-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8pt;
         margin-bottom: 5pt;
+        font-size: 9pt;
+    }
+
+    .news-banner-category {
+        background-color: #34495e;
+        color: white;
+        padding: 2pt 5pt;
+        border-radius: 2pt;
+        font-weight: bold;
+    }
+
+    .news-banner-date,
+    .news-banner-author,
+    .channel-badge {
+        color: #555;
+        font-size: 9pt;
+    }
+
+    .channel-badge {
+        background-color: #ecf0f1;
+        padding: 2pt 5pt;
+        border-radius: 2pt;
+        color: #2c3e50;
+    }
+
+    .news-modern-title,
+    .detail-title,
+    .news-banner-title,
+    h1, h2, h3 {
+        font-size: 12pt;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 5pt 0;
         page-break-after: avoid;
     }
 
-    .news-modern-meta {
+    .detail-title {
+        font-size: 13pt;
+    }
+
+    .news-modern-meta,
+    .detail-meta,
+    .news-meta {
         font-size: 10pt;
         color: #666;
-        margin-bottom: 5pt;
+        margin: 3pt 0;
+        page-break-after: avoid;
     }
 
-    .news-modern-summary {
+    .news-modern-summary,
+    .detail-description,
+    p {
         font-size: 11pt;
-        color: #000;
-        line-height: 1.4;
-        display: block !important;
+        color: #333;
+        line-height: 1.5;
+        margin: 5pt 0;
     }
 
-    /* Detail page */
+    /* Detail wrapper */
     .detail-wrapper {
         display: block !important;
-        grid-template-columns: 1fr !important;
+        width: 100%;
     }
 
     .news-detail {
-        width: 100% !important;
-        background-color: white;
-        padding: 10pt;
-        page-break-after: avoid;
+        display: block !important;
+        width: 100%;
+        padding: 0;
+        background: white;
+        page-break-inside: avoid;
     }
 
     .detail-header {
@@ -2085,19 +2113,83 @@ footer {
 
     .detail-category {
         display: inline-block;
-        background-color: #ddd;
-        color: #000;
-        padding: 3pt 6pt;
+        background: #34495e;
+        color: white;
+        padding: 3pt 8pt;
         font-size: 10pt;
-        margin-bottom: 8pt;
+        margin: 0 0 5pt 0;
+        border-radius: 3pt;
+        font-weight: bold;
     }
 
-    .detail-title {
-        font-size: 16pt;
+    .detail-image-wrapper {
+        margin: 10pt 0;
+        page-break-inside: avoid;
+    }
+
+    /* Featured banner special styling */
+    .featured-section .news-banner {
+        border: 2pt solid #3498db;
+        padding: 12pt;
+    }
+
+    .featured-section .news-banner-title {
+        font-size: 13pt;
+        color: #2c3e50;
+    }
+
+    /* Footer */
+    footer {
+        display: block !important;
+        background-color: #2c3e50;
+        color: white;
+        border-top: 2pt solid #34495e;
+        padding: 10pt;
+        margin-top: 20pt;
+        page-break-before: avoid;
+        font-size: 10pt;
+        text-align: center;
+    }
+
+    footer p {
+        margin: 3pt 0;
+        color: white;
+    }
+
+    footer a {
+        color: #3498db;
+        text-decoration: underline;
+    }
+
+    /* Links */
+    a {
+        color: #000 !important;
+        text-decoration: underline;
+    }
+
+    /* Images */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Tables */
+    table {
+        border-collapse: collapse;
+        page-break-inside: avoid;
+        width: 100%;
+    }
+
+    tr, td {
+        border: 1pt solid #000;
+        padding: 3pt;
+    }
+
+    th {
+        background: #ddd;
         font-weight: bold;
-        color: #000;
-        margin: 8pt 0;
-        page-break-after: avoid;
+    }
+}
     }
 
     .detail-meta {

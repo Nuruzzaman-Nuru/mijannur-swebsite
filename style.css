@@ -1763,6 +1763,85 @@ footer {
     flex-wrap: wrap;
 }
 
+/* Share Buttons Styling */
+.share-buttons {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.share-buttons h3 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.share-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    color: white;
+    text-align: center;
+}
+
+.share-btn i {
+    font-size: 1.1rem;
+}
+
+.share-facebook {
+    background-color: #1877f2;
+}
+
+.share-facebook:hover {
+    background-color: #166fe5;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
+}
+
+.share-twitter {
+    background-color: #1da1f2;
+}
+
+.share-twitter:hover {
+    background-color: #1a91da;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.4);
+}
+
+.share-whatsapp {
+    background-color: #25d366;
+}
+
+.share-whatsapp:hover {
+    background-color: #1ebd59;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+.share-email {
+    background-color: #666;
+}
+
+.share-email:hover {
+    background-color: #555;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(102, 102, 102, 0.4);
+}
+
 /* Responsive Design for Print/PDF Buttons */
 @media (max-width: 768px) {
     .section-header {
@@ -1789,5 +1868,14 @@ footer {
 
     .detail-actions .btn {
         width: 100%;
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+    }
+    
+    .share-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

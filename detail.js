@@ -117,6 +117,20 @@ function displayNewsDetail(news) {
         month: 'long',
         day: 'numeric'
     });
+    
+    // Update page title and meta tags for social sharing
+    document.title = news.title + ' - নিউজ পোর্টাল';
+    
+    // Update Open Graph meta tags
+    updateMetaTag('og:title', news.title);
+    updateMetaTag('og:description', news.description.substring(0, 160));
+    updateMetaTag('og:image', imageUrl);
+    updateMetaTag('og:url', window.location.href);
+    
+    // Update Twitter Card meta tags
+    updateMetaTag('twitter:title', news.title);
+    updateMetaTag('twitter:description', news.description.substring(0, 160));
+    updateMetaTag('twitter:image', imageUrl);
 
     const detailHtml = `
         <div class="detail-header">
@@ -137,6 +151,22 @@ function displayNewsDetail(news) {
         <div class="detail-body">
             <p class="detail-description">${news.description}</p>
         </div>
+        
+        <div class="share-buttons">
+            <h3>শেয়ার করুন:</h3>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn share-facebook" title="Facebook এ শেয়ার করুন">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(news.title)}" target="_blank" class="share-btn share-twitter" title="Twitter এ শেয়ার করুন">
+                <i class="fab fa-twitter"></i> Twitter
+            </a>
+            <a href="https://wa.me/?text=${encodeURIComponent(news.title + ' ' + window.location.href)}" target="_blank" class="share-btn share-whatsapp" title="WhatsApp এ শেয়ার করুন">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <a href="mailto:?subject=${encodeURIComponent(news.title)}&body=${encodeURIComponent(news.description + '\n\n' + window.location.href)}" class="share-btn share-email" title="ইমেইল এ শেয়ার করুন">
+                <i class="fas fa-envelope"></i> ইমেইল
+            </a>
+        </div>
 
         <div class="detail-footer">
             <a href="news.html" class="back-link">← সব খবরে ফিরুন</a>
@@ -144,6 +174,23 @@ function displayNewsDetail(news) {
     `;
 
     document.getElementById('detail-content').innerHTML = detailHtml;
+}
+
+// Function to update meta tags
+function updateMetaTag(property, content) {
+    let metaTag = document.querySelector(`meta[property="${property}"], meta[name="${property}"]`);
+    
+    if (!metaTag) {
+        metaTag = document.createElement('meta');
+        if (property.startsWith('og:')) {
+            metaTag.setAttribute('property', property);
+        } else {
+            metaTag.setAttribute('name', property);
+        }
+        document.head.appendChild(metaTag);
+    }
+    
+    metaTag.setAttribute('content', content);
 }
 
 // Display related news (same category)

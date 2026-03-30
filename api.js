@@ -30,6 +30,37 @@ function writeDatabase(data) {
     fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 }
 
+// Auto-delete unpublished news older than 24 hours
+function cleanupOldUnpublishedNews() {
+    const db = readDatabase();
+    const now = Date.now();
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+    
+    const initialLength = db.news.length;
+    
+    // Keep only published news or unpublished news created within 24 hours
+    db.news = db.news.filter(news => {
+        const isPublished = news.isPublished === true;
+        if (isPublished) return true; // Keep published forever
+        
+        const createdAt = news.createdAt ? parseInt(news.createdAt) : 0;
+        const age = now - createdAt;
+        const isRecent = age < TWENTY_FOUR_HOURS;
+        
+        return isRecent; // Keep if less than 24 hours old
+    });
+    
+    if (db.news.length < initialLength) {
+        writeDatabase(db);
+        console.log(`Deleted ${initialLength - db.news.length} old unpublished news items`);
+    }
+}
+
+// Schedule cleanup every hour
+setInterval(cleanupOldUnpublishedNews, 60 * 60 * 1000);
+// Run cleanup once on startup
+cleanupOldUnpublishedNews();
+
 // GET all news
 app.get('/api/news', (req, res) => {
     const db = readDatabase();
@@ -58,7 +89,9 @@ app.post('/api/news', (req, res) => {
         image: req.body.image,
         date: req.body.date || new Date().toISOString().split('T')[0],
         author: req.body.author,
-        postedBy: req.body.postedBy || 'adminmijanur'
+        postedBy: req.body.postedBy || 'adminmijanur',
+        isPublished: req.body.isPublished === true ? true : false,  // Default false (draft)
+        createdAt: Date.now()  // Timestamp when created
     };
     
     db.news.unshift(newNews);
@@ -86,9 +119,29 @@ app.put('/api/news/:id', (req, res) => {
     const index = db.news.findIndex(item => item.id == req.params.id);
     
     if (index !== -1) {
-        db.news[index] = { ...db.news[index], ...req.body, id: db.news[index].id };
+        const updated = { 
+            ...db.news[index], 
+            ...req.body, 
+            id: db.news[index].id,
+            createdAt: db.news[index].createdAt  // Never change createdAt
+        };
+        db.news[index] = updated;
         writeDatabase(db);
         res.json(db.news[index]);
+    } else {
+        res.status(404).json({ error: 'News not found' });
+    }
+});
+
+// PUBLISH news (mark as published - prevents deletion)
+app.patch('/api/news/:id/publish', (req, res) => {
+    const db = readDatabase();
+    const index = db.news.findIndex(item => item.id == req.params.id);
+    
+    if (index !== -1) {
+        db.news[index].isPublished = true;
+        writeDatabase(db);
+        res.json({ success: true, message: 'News published', news: db.news[index] });
     } else {
         res.status(404).json({ error: 'News not found' });
     }

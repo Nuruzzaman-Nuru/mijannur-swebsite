@@ -793,23 +793,28 @@ footer {
         width: 100%;
     }
 
+    .nav-links li {
+        width: 100%;
+    }
+
     .nav-links a {
         display: block;
         width: 100%;
         padding: 0.45rem 0.55rem;
         border-radius: 4px;
-        color: #2c3e50;
+        color: #2c3e50 !important;
+        text-decoration: none;
         font-weight: 600;
     }
 
     .nav-links a:hover,
     .nav-links a:focus-visible {
-        color: #1f7cb8;
+        color: #1f7cb8 !important;
         background: #eef5fb;
     }
 
     .nav-links a.active {
-        color: #1f7cb8;
+        color: #1f7cb8 !important;
         background: #eaf3fb;
     }
 

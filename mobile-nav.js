@@ -5,6 +5,40 @@
 
     if (!toggleButton || !navbarContent) return;
 
+    const applyMobileMenuFixes = () => {
+        if (window.innerWidth > MOBILE_BREAKPOINT) return;
+
+        navbarContent.style.maxHeight = "calc(100vh - 88px)";
+        navbarContent.style.overflowY = "auto";
+
+        navbarContent.querySelectorAll(".nav-links li").forEach(item => {
+            item.style.width = "100%";
+        });
+
+        navbarContent.querySelectorAll(".nav-links a").forEach(link => {
+            link.style.display = "block";
+            link.style.width = "100%";
+            link.style.color = "#2c3e50";
+            link.style.textDecoration = "none";
+        });
+    };
+
+    const clearMobileMenuFixes = () => {
+        navbarContent.style.maxHeight = "";
+        navbarContent.style.overflowY = "";
+
+        navbarContent.querySelectorAll(".nav-links li").forEach(item => {
+            item.style.width = "";
+        });
+
+        navbarContent.querySelectorAll(".nav-links a").forEach(link => {
+            link.style.display = "";
+            link.style.width = "";
+            link.style.color = "";
+            link.style.textDecoration = "";
+        });
+    };
+
     const closeMenu = () => {
         navbarContent.classList.remove("is-open");
         toggleButton.setAttribute("aria-expanded", "false");
@@ -12,6 +46,7 @@
     };
 
     const openMenu = () => {
+        applyMobileMenuFixes();
         navbarContent.classList.add("is-open");
         toggleButton.setAttribute("aria-expanded", "true");
         toggleButton.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
@@ -35,7 +70,13 @@
 
     window.addEventListener("resize", () => {
         if (window.innerWidth > MOBILE_BREAKPOINT) {
+            clearMobileMenuFixes();
             closeMenu();
+            return;
         }
+
+        applyMobileMenuFixes();
     });
+
+    applyMobileMenuFixes();
 })();

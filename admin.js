@@ -47,6 +47,64 @@ function saveUserNewsSafe(newsList) {
     }
 }
 
+function parseDateLikeValue(value) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+
+    const text = String(value || "").trim();
+    if (!text) return 0;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+        const timestamp = new Date(`${text}T00:00:00`).getTime();
+        return Number.isNaN(timestamp) ? 0 : timestamp;
+    }
+
+    const timestamp = new Date(text).getTime();
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function getNewsTimestamp(item) {
+    if (!item || typeof item !== "object") return 0;
+
+    const candidates = [item.updatedAt, item.createdAt, item.publishedAt, item.date];
+    for (const value of candidates) {
+        const timestamp = parseDateLikeValue(value);
+        if (timestamp > 0) return timestamp;
+    }
+
+    return 0;
+}
+
+function mergeAdminNewsLists(...newsLists) {
+    const keyed = new Map();
+    const withoutId = [];
+
+    newsLists.forEach(list => {
+        (list || []).forEach(item => {
+            if (!isAdminPostedNews(item)) return;
+
+            const id = String(item.id || "").trim();
+            if (!id) {
+                withoutId.push(item);
+                return;
+            }
+
+            if (!keyed.has(id)) {
+                keyed.set(id, item);
+                return;
+            }
+
+            const existing = keyed.get(id);
+            if (getNewsTimestamp(item) > getNewsTimestamp(existing)) {
+                keyed.set(id, item);
+            }
+        });
+    });
+
+    const merged = [...keyed.values(), ...withoutId];
+    merged.sort((a, b) => getNewsTimestamp(b) - getNewsTimestamp(a));
+    return merged;
+}
+
 function isDataImageUrl(value) {
     return typeof value === "string" && value.startsWith("data:image/");
 }
@@ -465,11 +523,12 @@ newsForm.addEventListener("submit", async (e) => {
     try {
         // Keep local cache cleaned
         const parsedUserNews = getParsedUserNews();
-        let userNews = parsedUserNews.filter(isAdminPostedNews);
+        let userNews = mergeAdminNewsLists(parsedUserNews);
 
         let effectiveNews = null;
         let successMessage = "";
         let syncedWithApi = false;
+        let shouldRenderLocalCache = false;
 
         if (editingNewsId) {
             const existing = currentAdminNews.find(item => String(item.id) === String(editingNewsId));
@@ -493,6 +552,7 @@ newsForm.addEventListener("submit", async (e) => {
             const cacheSaveResult = saveUserNewsWithFallback(userNews);
             userNews = cacheSaveResult.list;
             currentAdminNews = userNews;
+            shouldRenderLocalCache = !syncedWithApi;
 
             successMessage = updatedByApi
                 ? "খবর এডিট সফল হয়েছে! সব ডিভাইসে আপডেট দেখাবে।"
@@ -519,6 +579,7 @@ newsForm.addEventListener("submit", async (e) => {
             const cacheSaveResult = saveUserNewsWithFallback(userNews);
             userNews = cacheSaveResult.list;
             currentAdminNews = userNews;
+            shouldRenderLocalCache = !syncedWithApi;
 
             successMessage = createdByApi
                 ? "খবর সফলভাবে পোস্ট হয়েছে! এখন ফোন ও ল্যাপটপে দেখা যাবে।"
@@ -536,7 +597,7 @@ newsForm.addEventListener("submit", async (e) => {
 
         alert(successMessage);
         resetNewsFormToCreateMode();
-        if (typeof successMessage === "string" && successMessage.includes("refresh দিলে হারাতে পারে")) {
+        if (shouldRenderLocalCache) {
             renderAdminNewsList(currentAdminNews);
         } else {
             await loadRecentNews();
@@ -555,17 +616,14 @@ newsForm.addEventListener("submit", async (e) => {
 async function loadRecentNews() {
     const apiNews = await loadNewsFromApi();
     let userNews;
+    const localNews = mergeAdminNewsLists(getParsedUserNews());
 
     if (Array.isArray(apiNews)) {
-        userNews = apiNews.filter(isAdminPostedNews);
+        userNews = mergeAdminNewsLists(localNews, apiNews);
         saveUserNewsSafe(userNews);
     } else {
-        const parsedUserNews = getParsedUserNews();
-        userNews = parsedUserNews.filter(isAdminPostedNews);
-
-        if (userNews.length !== parsedUserNews.length) {
-            saveUserNewsSafe(userNews);
-        }
+        userNews = localNews;
+        saveUserNewsSafe(userNews);
     }
     
     currentAdminNews = userNews;

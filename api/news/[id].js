@@ -1,9 +1,7 @@
-"use strict";
+﻿"use strict";
 
 const {
-    NEWS_TTL_HOURS,
     normalizeNewsItem,
-    pruneExpiredNews,
     normalizeDatabaseShape,
     loadNewsStore,
     saveNewsStore
@@ -51,15 +49,7 @@ module.exports = async (req, res) => {
 
     try {
         const { db, meta } = await loadNewsStore();
-        const normalizedDb = normalizeDatabaseShape(db);
-        const pruned = pruneExpiredNews(normalizedDb);
-        const workingDb = pruned.db;
-
-        if (req.method === "GET" && pruned.changed) {
-            const commitMessage = `Auto-remove expired news older than ${NEWS_TTL_HOURS}h`;
-            await saveNewsStore(workingDb, meta, commitMessage);
-        }
-
+        const workingDb = normalizeDatabaseShape(db);
         const index = workingDb.news.findIndex(item => String(item.id) === id);
 
         if (req.method === "GET") {

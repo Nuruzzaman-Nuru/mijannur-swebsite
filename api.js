@@ -30,37 +30,6 @@ function writeDatabase(data) {
     fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 }
 
-// Auto-delete unpublished news older than 24 hours
-function cleanupOldUnpublishedNews() {
-    const db = readDatabase();
-    const now = Date.now();
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-    
-    const initialLength = db.news.length;
-    
-    // Keep only published news or unpublished news created within 24 hours
-    db.news = db.news.filter(news => {
-        const isPublished = news.isPublished === true;
-        if (isPublished) return true; // Keep published forever
-        
-        const createdAt = news.createdAt ? parseInt(news.createdAt) : 0;
-        const age = now - createdAt;
-        const isRecent = age < TWENTY_FOUR_HOURS;
-        
-        return isRecent; // Keep if less than 24 hours old
-    });
-    
-    if (db.news.length < initialLength) {
-        writeDatabase(db);
-        console.log(`Deleted ${initialLength - db.news.length} old unpublished news items`);
-    }
-}
-
-// Schedule cleanup every hour
-setInterval(cleanupOldUnpublishedNews, 60 * 60 * 1000);
-// Run cleanup once on startup
-cleanupOldUnpublishedNews();
-
 // GET all news
 app.get('/api/news', (req, res) => {
     const db = readDatabase();
@@ -133,7 +102,7 @@ app.put('/api/news/:id', (req, res) => {
     }
 });
 
-// PUBLISH news (mark as published - prevents deletion)
+// PUBLISH news
 app.patch('/api/news/:id/publish', (req, res) => {
     const db = readDatabase();
     const index = db.news.findIndex(item => item.id == req.params.id);

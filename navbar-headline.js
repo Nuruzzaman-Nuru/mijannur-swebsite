@@ -1,6 +1,5 @@
 (() => {
     const API_NEWS_ENDPOINT = "/api/news";
-    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
     const REFRESH_INTERVAL_MS = 60 * 1000;
     const HEADLINE_SPEED_PX_PER_SEC = 80;
 
@@ -43,13 +42,6 @@
         }
 
         return 0;
-    }
-
-    function isWithinLast24Hours(item, nowMs = Date.now()) {
-        const timestamp = getNewsTimestamp(item);
-        if (!timestamp) return false;
-        if (timestamp > nowMs) return true;
-        return nowMs - timestamp <= TWENTY_FOUR_HOURS_MS;
     }
 
     function buildDetailHref(item) {
@@ -144,12 +136,9 @@
     }
 
     function getRecentHeadlines(sourceNews) {
-        const nowMs = Date.now();
-
         return (sourceNews || [])
             .filter(item => item && typeof item === "object")
             .filter(item => String(item.title || "").trim())
-            .filter(item => isWithinLast24Hours(item, nowMs))
             .sort((a, b) => getNewsTimestamp(b) - getNewsTimestamp(a))
             .slice(0, 20);
     }

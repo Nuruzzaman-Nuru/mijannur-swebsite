@@ -20,7 +20,6 @@ const MIN_IMAGE_QUALITY = 0.45;
 const IMAGE_QUALITY_STEP = 0.1;
 const MAX_IMAGE_DATA_URL_LENGTH = 350000;
 const MAX_OFFLINE_NEWS_ITEMS = 25;
-const OFFLINE_PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image";
 let editingNewsId = null;
 let editingOriginalDate = null;
 let currentAdminNews = [];

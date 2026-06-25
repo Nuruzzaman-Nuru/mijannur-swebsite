@@ -30,7 +30,6 @@ const IMAGE_QUALITY = 0.75;
 const MIN_IMAGE_QUALITY = 0.45;
 const IMAGE_QUALITY_STEP = 0.1;
 const MAX_IMAGE_DATA_URL_LENGTH = 350000;
-const MAX_OFFLINE_NEWS_ITEMS = 25;
 let editingNewsId = null;
 let editingOriginalDate = null;
 let currentAdminNews = [];
@@ -131,8 +130,7 @@ function normalizeImageReference(value) {
 }
 
 function makeStorageFriendlyNews(newsList) {
-    const trimmed = (newsList || []).slice(0, MAX_OFFLINE_NEWS_ITEMS);
-    return trimmed.map((item, index) => {
+    return (newsList || []).map((item, index) => {
         if (isOversizedImageReference(item.image)) {
             return { ...item, image: OFFLINE_PLACEHOLDER_IMAGE };
         }
@@ -152,28 +150,19 @@ function saveUserNewsWithFallback(newsList) {
     }
 
     const noDataImages = (newsList || [])
-        .slice(0, MAX_OFFLINE_NEWS_ITEMS)
-        .map(item => isOversizedImageReference(item.image) ? { ...item, image: OFFLINE_PLACEHOLDER_IMAGE } : item);
+        .map(item => isDataImageUrl(item.image) ? { ...item, image: OFFLINE_PLACEHOLDER_IMAGE } : item);
     if (saveUserNewsSafe(noDataImages)) {
         return { saved: true, list: noDataImages, downgradedImage: true };
     }
 
     const compactList = (newsList || [])
-        .slice(0, 12)
-        .map(item => ({ ...item, image: OFFLINE_PLACEHOLDER_IMAGE }));
-    if (saveUserNewsSafe(compactList)) {
-        return { saved: true, list: compactList, downgradedImage: true };
-    }
-
-    const emergencyOneItem = (newsList || [])
-        .slice(0, 1)
         .map(item => ({
             ...item,
-            description: String(item.description || "").slice(0, 300),
+            description: String(item.description || "").slice(0, 500),
             image: OFFLINE_PLACEHOLDER_IMAGE
         }));
-    if (saveUserNewsSafe(emergencyOneItem)) {
-        return { saved: true, list: emergencyOneItem, downgradedImage: true };
+    if (saveUserNewsSafe(compactList)) {
+        return { saved: true, list: compactList, downgradedImage: true };
     }
 
     return { saved: false, list: newsList, downgradedImage: false };

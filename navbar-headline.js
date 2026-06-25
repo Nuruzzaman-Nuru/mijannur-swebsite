@@ -1,5 +1,17 @@
 (() => {
-    const API_NEWS_ENDPOINT = "/api/news";
+    const FALLBACK_API_BASE_URL = "https://mijannur-swebsite.vercel.app";
+    function getApiNewsEndpoint() {
+        const configuredBase = String(window.NEWS_API_BASE_URL || "").replace(/\/+$/, "");
+        if (configuredBase) return `${configuredBase}/api/news`;
+
+        const hostname = window.location.hostname;
+        const isStaticHost = window.location.protocol === "file:" || hostname.endsWith("github.io");
+        if (isStaticHost) return `${FALLBACK_API_BASE_URL}/api/news`;
+
+        return "/api/news";
+    }
+
+    const API_NEWS_ENDPOINT = getApiNewsEndpoint();
     const REFRESH_INTERVAL_MS = 60 * 1000;
     const HEADLINE_SPEED_PX_PER_SEC = 80;
 
@@ -124,15 +136,31 @@
     }
 
     async function loadFromJson() {
-        try {
-            const response = await fetch("news.json", { cache: "no-store" });
-            if (!response.ok) return [];
-
-            const data = await response.json();
-            return Array.isArray(data?.news) ? data.news : [];
-        } catch (error) {
-            return [];
+        if (window.NewsSource && typeof window.NewsSource.loadNewsFromGitHub === "function") {
+            return window.NewsSource.loadNewsFromGitHub();
         }
+
+        const sources = [
+            "https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json",
+            "db.json",
+            "news.json"
+        ];
+
+        for (const source of sources) {
+            try {
+                const separator = source.includes("?") ? "&" : "?";
+                const response = await fetch(`${source}${separator}v=${Date.now()}`, { cache: "no-store" });
+                if (!response.ok) continue;
+
+                const data = await response.json();
+                const news = Array.isArray(data) ? data : data.news;
+                if (Array.isArray(news)) return news;
+            } catch (error) {
+                // Try the next source.
+            }
+        }
+
+        return [];
     }
 
     function getRecentHeadlines(sourceNews) {

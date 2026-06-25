@@ -13,7 +13,18 @@ const imageFile = document.getElementById("image-file");
 
 const ADMIN_USERNAME = "adminmijanur";
 const ADMIN_PASSWORD = "12345678";
-const API_NEWS_ENDPOINT = "/api/news";
+const FALLBACK_API_BASE_URL = "https://mijannur-swebsite.vercel.app";
+function getApiNewsEndpoint() {
+    const configuredBase = String(window.NEWS_API_BASE_URL || "").replace(/\/+$/, "");
+    if (configuredBase) return `${configuredBase}/api/news`;
+
+    const hostname = window.location.hostname;
+    const isStaticHost = window.location.protocol === "file:" || hostname.endsWith("github.io");
+    if (isStaticHost) return `${FALLBACK_API_BASE_URL}/api/news`;
+
+    return "/api/news";
+}
+const API_NEWS_ENDPOINT = getApiNewsEndpoint();
 const MAX_IMAGE_WIDTH = 1280;
 const IMAGE_QUALITY = 0.75;
 const MIN_IMAGE_QUALITY = 0.45;
@@ -355,6 +366,14 @@ async function deleteNewsFromApi(id) {
     }
 }
 
+async function loadNewsFromStaticSource() {
+    if (window.NewsSource && typeof window.NewsSource.loadNewsFromGitHub === "function") {
+        return window.NewsSource.loadNewsFromGitHub();
+    }
+
+    return null;
+}
+
 function isAdminPostedNews(item) {
     if (!item || typeof item !== "object") return false;
 
@@ -614,11 +633,15 @@ newsForm.addEventListener("submit", async (e) => {
 
 async function loadRecentNews() {
     const apiNews = await loadNewsFromApi();
+    const staticNews = Array.isArray(apiNews) ? null : await loadNewsFromStaticSource();
     let userNews;
     const localNews = mergeAdminNewsLists(getParsedUserNews());
 
     if (Array.isArray(apiNews)) {
         userNews = mergeAdminNewsLists(localNews, apiNews);
+        saveUserNewsSafe(userNews);
+    } else if (Array.isArray(staticNews)) {
+        userNews = mergeAdminNewsLists(localNews, staticNews);
         saveUserNewsSafe(userNews);
     } else {
         userNews = localNews;

@@ -2,7 +2,20 @@
 let allNews = [];
 let userNews = [];
 let currentCategory = null;
-const API_NEWS_ENDPOINT = '/api/news';
+const FALLBACK_API_BASE_URL = 'https://mijannur-swebsite.vercel.app';
+
+function getApiNewsEndpoint() {
+    const configuredBase = String(window.NEWS_API_BASE_URL || '').replace(/\/+$/, '');
+    if (configuredBase) return `${configuredBase}/api/news`;
+
+    const hostname = window.location.hostname;
+    const isStaticHost = window.location.protocol === 'file:' || hostname.endsWith('github.io');
+    if (isStaticHost) return `${FALLBACK_API_BASE_URL}/api/news`;
+
+    return '/api/news';
+}
+
+const API_NEWS_ENDPOINT = getApiNewsEndpoint();
 
 function isAdminPostedNews(item) {
     if (!item || typeof item !== 'object') return false;
@@ -118,9 +131,30 @@ async function loadNewsFromApi() {
 }
 
 async function loadNewsFromJsonFile() {
-    const response = await fetch('news.json');
-    const data = await response.json();
-    return data.news || [];
+    if (window.NewsSource && typeof window.NewsSource.loadNewsFromGitHub === 'function') {
+        return window.NewsSource.loadNewsFromGitHub();
+    }
+
+    const sources = [
+        'https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json',
+        'db.json',
+        'news.json'
+    ];
+
+    for (const source of sources) {
+        try {
+            const response = await fetch(`${source}${source.includes('?') ? '&' : '?'}v=${Date.now()}`, { cache: 'no-store' });
+            if (!response.ok) continue;
+
+            const data = await response.json();
+            const news = Array.isArray(data) ? data : data.news;
+            if (Array.isArray(news)) return news;
+        } catch (error) {
+            // Try the next source.
+        }
+    }
+
+    return [];
 }
 
 // Load news from JSON and localStorage

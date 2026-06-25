@@ -1,38 +1,67 @@
-// Auto-update news from GitHub raw file
-// এই ফাংশন GitHub থেকে news.json লোড করে
+// Shared news loader for static/GitHub pages.
+// Admin API persists news into db.json, so public pages must read db.json too.
 
-const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/news.json';
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json";
+const LOCAL_DB_URL = "db.json";
+const LEGACY_NEWS_URL = "news.json";
+const NEWS_CACHE_KEY = "cachedNews";
+
+function normalizeNewsPayload(payload) {
+    if (Array.isArray(payload)) return payload;
+    if (payload && Array.isArray(payload.news)) return payload.news;
+    return [];
+}
+
+async function fetchNewsJson(url) {
+    const separator = url.includes("?") ? "&" : "?";
+    const response = await fetch(`${url}${separator}v=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Accept": "application/json" }
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return normalizeNewsPayload(data);
+}
+
+function readCachedNews() {
+    try {
+        const cached = localStorage.getItem(NEWS_CACHE_KEY);
+        return cached ? normalizeNewsPayload(JSON.parse(cached)) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function cacheNews(newsList) {
+    try {
+        localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(newsList || []));
+    } catch (error) {
+        // Ignore cache failures. Fresh fetches still work.
+    }
+}
 
 async function loadNewsFromGitHub() {
-    try {
-        const response = await fetch(GITHUB_RAW_URL, {
-            headers: {
-                'Accept': 'application/json',
-                'Cache-Control': 'no-cache'
+    const sources = [GITHUB_RAW_URL, LOCAL_DB_URL, LEGACY_NEWS_URL];
+
+    for (const source of sources) {
+        try {
+            const news = await fetchNewsJson(source);
+            if (Array.isArray(news) && news.length) {
+                cacheNews(news);
+                return news;
             }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('cachedNews', JSON.stringify(data.news));
-            console.log('News updated from GitHub');
-            return data.news;
+        } catch (error) {
+            // Try the next source.
         }
-    } catch (error) {
-        console.log('Could not fetch from GitHub, using cached news');
     }
-    
-    // ফলব্যাক: localStorage থেকে ব্যবহার করুন
-    const cached = localStorage.getItem('cachedNews');
-    return cached ? JSON.parse(cached) : [];
+
+    return readCachedNews();
 }
 
-// প্রতি ১০ মিনিটে আপডেট করুন
-setInterval(loadNewsFromGitHub, 10 * 60 * 1000);
-
-// পেজ লোড হওয়ার সাথে সাথে আপডেট করুন
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadNewsFromGitHub);
-} else {
-    loadNewsFromGitHub();
-}
+window.NewsSource = {
+    rawUrl: GITHUB_RAW_URL,
+    loadNewsFromGitHub,
+    readCachedNews
+};

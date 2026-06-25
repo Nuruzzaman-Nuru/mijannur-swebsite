@@ -135,11 +135,10 @@ async function loadNewsFromJsonFile() {
         return window.NewsSource.loadNewsFromGitHub();
     }
 
-    const sources = [
-        'https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json',
-        'db.json',
-        'news.json'
-    ];
+    const rawNewsUrl = (window.NewsSource && window.NewsSource.rawUrl)
+        || window.GITHUB_RAW_NEWS_URL
+        || 'https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json';
+    const sources = [rawNewsUrl, 'db.json', 'news.json'].filter(Boolean);
 
     for (const source of sources) {
         try {

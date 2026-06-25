@@ -1,7 +1,11 @@
 // Shared news loader for static/GitHub pages.
 // Admin API persists news into db.json, so public pages must read db.json too.
 
-const GITHUB_RAW_URL = "https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json";
+const GITHUB_RAW_URL = String(
+    window.GITHUB_RAW_NEWS_URL ||
+    (window.NewsSiteConfig && window.NewsSiteConfig.githubRawNewsUrl) ||
+    "https://raw.githubusercontent.com/Nuruzzaman-Nuru/mijannur-swebsite/main/db.json"
+).trim();
 const LOCAL_DB_URL = "db.json";
 const LEGACY_NEWS_URL = "news.json";
 const NEWS_CACHE_KEY = "cachedNews";

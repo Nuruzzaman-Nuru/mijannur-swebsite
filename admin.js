@@ -303,6 +303,7 @@ function getApiPersistenceHint() {
     const likelyStorageIssue = message.includes("erofs")
         || message.includes("read-only")
         || message.includes("permission")
+        || message.includes("github_env_missing")
         || message.includes("github_write_failed")
         || message.includes("failed to handle news request");
 

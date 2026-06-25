@@ -629,13 +629,14 @@ async function loadRecentNews() {
 
     if (Array.isArray(apiNews)) {
         userNews = mergeAdminNewsLists(localNews, apiNews);
-        saveUserNewsSafe(userNews);
+        saveUserNewsWithFallback(userNews);
     } else if (Array.isArray(staticNews)) {
         userNews = mergeAdminNewsLists(localNews, staticNews);
-        saveUserNewsSafe(userNews);
+        saveUserNewsWithFallback(userNews);
     } else {
         userNews = localNews;
-        saveUserNewsSafe(userNews);
+        const cacheSaveResult = saveUserNewsWithFallback(userNews);
+        userNews = cacheSaveResult.list;
     }
     
     currentAdminNews = userNews;

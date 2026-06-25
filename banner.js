@@ -28,7 +28,11 @@ function displayNewsAsBanners(newsArray, containerId) {
     const bannersGrid = document.createElement('div');
     bannersGrid.className = 'news-banners-grid';
 
-    newsArray.slice(0, 6).forEach(item => {
+    const rawLimit = String(container.dataset.newsLimit || '').trim().toLowerCase();
+    const limit = rawLimit && rawLimit !== 'all' ? Number.parseInt(rawLimit, 10) : 0;
+    const visibleNews = Number.isFinite(limit) && limit > 0 ? newsArray.slice(0, limit) : newsArray;
+
+    visibleNews.forEach(item => {
         const banner = document.createElement('div');
         banner.className = 'news-banner news-banner-small';
         banner.style.cursor = 'pointer';

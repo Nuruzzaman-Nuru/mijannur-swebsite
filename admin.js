@@ -369,8 +369,19 @@ function isAdminPostedNews(item) {
 
     const postedBy = (item.postedBy || "").toString().trim().toLowerCase();
     const id = (item.id || "").toString();
+    const hasRequiredContent = Boolean(
+        String(item.title || "").trim() &&
+        String(item.description || "").trim()
+    );
 
-    return postedBy === ADMIN_USERNAME || id.startsWith("admin_");
+    if (!hasRequiredContent) return false;
+
+    return (
+        postedBy === "admin" ||
+        postedBy === ADMIN_USERNAME ||
+        id.startsWith("admin_") ||
+        postedBy === ""
+    );
 }
 
 window.addEventListener("load", async () => {
@@ -623,21 +634,17 @@ newsForm.addEventListener("submit", async (e) => {
 
 async function loadRecentNews() {
     const apiNews = await loadNewsFromApi();
-    const staticNews = Array.isArray(apiNews) ? null : await loadNewsFromStaticSource();
-    let userNews;
+    const shouldUseStaticFallback = !Array.isArray(apiNews) || apiNews.length === 0;
+    const staticNews = shouldUseStaticFallback ? await loadNewsFromStaticSource() : null;
     const localNews = mergeAdminNewsLists(getParsedUserNews());
+    let userNews = mergeAdminNewsLists(
+        localNews,
+        Array.isArray(apiNews) ? apiNews : [],
+        Array.isArray(staticNews) ? staticNews : []
+    );
 
-    if (Array.isArray(apiNews)) {
-        userNews = mergeAdminNewsLists(localNews, apiNews);
-        saveUserNewsWithFallback(userNews);
-    } else if (Array.isArray(staticNews)) {
-        userNews = mergeAdminNewsLists(localNews, staticNews);
-        saveUserNewsWithFallback(userNews);
-    } else {
-        userNews = localNews;
-        const cacheSaveResult = saveUserNewsWithFallback(userNews);
-        userNews = cacheSaveResult.list;
-    }
+    const cacheSaveResult = saveUserNewsWithFallback(userNews);
+    userNews = cacheSaveResult.list;
     
     currentAdminNews = userNews;
     renderAdminNewsList(userNews);

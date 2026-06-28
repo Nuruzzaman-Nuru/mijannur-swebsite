@@ -364,6 +364,14 @@ main {
     min-width: 0;
 }
 
+.news-page-wrapper {
+    grid-template-columns: 1fr;
+}
+
+.news-page-wrapper .sidebar {
+    width: 100%;
+}
+
 .news-section h2 {
     margin-bottom: 1rem;
     color: #2c3e50;
@@ -1307,8 +1315,15 @@ footer {
 #news-container > .news-banners-grid {
     grid-column: 1 / -1;
     width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
+@media (max-width: 1024px) {
+    #news-container > .news-banners-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 .news-banner-small {
     height: auto;
     margin-bottom: 0;

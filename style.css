@@ -1303,6 +1303,12 @@ footer {
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
+
+#news-container > .news-banners-grid {
+    grid-column: 1 / -1;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .news-banner-small {
     height: auto;
     margin-bottom: 0;
@@ -1346,6 +1352,10 @@ footer {
         gap: 0.5rem;
     }
     .news-banners-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #news-container > .news-banners-grid {
         grid-template-columns: 1fr;
     }
 }

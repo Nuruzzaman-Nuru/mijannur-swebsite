@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/news-poster.js": {
+      "includeFiles": "images/logo.png"
+    }
+  },
   "rewrites": [
     {
       "source": "/detail.html",

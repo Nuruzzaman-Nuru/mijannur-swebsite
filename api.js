@@ -8,6 +8,7 @@ const {
     getPublicSiteUrl,
     parseImageDataUrl
 } = require('./lib/news-share');
+const { createNewsPoster } = require('./lib/news-poster');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -166,6 +167,27 @@ app.get('/api/news-image', (req, res) => {
 
     const imageUrl = getNewsImageUrl(news, getPublicSiteUrl());
     return res.redirect(302, imageUrl);
+});
+
+app.get('/api/news-poster', async (req, res) => {
+    const id = String(req.query.id || '').trim();
+    if (!id) return res.status(400).send('News id is required');
+
+    const db = readDatabase();
+    const news = (Array.isArray(db) ? db : db.news || []).find(item => String(item.id) === id);
+    if (!news) return res.status(404).send('News not found');
+
+    try {
+        const poster = await createNewsPoster(news, { logoPath: path.join(__dirname, 'images/logo.png') });
+        res.set({
+            'Cache-Control': 'public, max-age=300',
+            'X-Content-Type-Options': 'nosniff'
+        });
+        return res.type('jpeg').send(poster);
+    } catch (error) {
+        console.error('Could not create news poster:', error);
+        return res.status(500).send('Could not create news poster');
+    }
 });
 
 app.listen(PORT, '0.0.0.0', () => {

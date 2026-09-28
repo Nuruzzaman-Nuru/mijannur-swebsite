@@ -25,18 +25,10 @@ function getNewsShareUrl(news) {
 }
 
 function getNewsShareImageUrl(news) {
-    if (String(news.image || '').startsWith('data:image/')) {
-        const imageUrl = new URL(`${NEWS_SHARE_BASE_URL}/api/news-image`);
-        imageUrl.searchParams.set('id', String(news.id));
-        imageUrl.searchParams.set('v', String(news.updatedAt || news.createdAt || news.date || '1'));
-        return imageUrl.href;
-    }
-
-    try {
-        return new URL(news.image || 'images/logo.png', `${NEWS_SHARE_BASE_URL}/`).href;
-    } catch (error) {
-        return `${NEWS_SHARE_BASE_URL}/images/logo.png`;
-    }
+    const imageUrl = new URL(`${NEWS_SHARE_BASE_URL}/api/news-poster`);
+    imageUrl.searchParams.set('id', String(news.id));
+    imageUrl.searchParams.set('v', String(news.updatedAt || news.createdAt || news.date || '1'));
+    return imageUrl.href;
 }
 
 function isAdminPostedNews(item) {

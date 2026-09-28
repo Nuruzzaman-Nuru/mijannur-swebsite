@@ -2,6 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const {
+    createNewsShareHtml,
+    getNewsImageUrl,
+    getNewsShareUrl,
+    getPublicSiteUrl,
+    parseImageDataUrl
+} = require('./lib/news-share');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -114,6 +121,39 @@ app.patch('/api/news/:id/publish', (req, res) => {
     } else {
         res.status(404).json({ error: 'News not found' });
     }
+});
+
+app.get('/api/news-share', (req, res) => {
+    const id = String(req.query.id || '').trim();
+    if (!id) return res.status(400).send('News id is required');
+
+    const db = readDatabase();
+    const news = (Array.isArray(db) ? db : db.news || []).find(item => String(item.id) === id);
+    if (!news) return res.status(404).send('News not found');
+
+    res.set('Cache-Control', 'no-store, max-age=0');
+    res.type('html').send(createNewsShareHtml(news, getPublicSiteUrl()));
+});
+
+app.get('/api/news-image', (req, res) => {
+    const id = String(req.query.id || '').trim();
+    if (!id) return res.status(400).send('News id is required');
+
+    const db = readDatabase();
+    const news = (Array.isArray(db) ? db : db.news || []).find(item => String(item.id) === id);
+    if (!news) return res.status(404).send('News not found');
+
+    const imageData = parseImageDataUrl(news.image);
+    if (imageData && imageData.buffer.length > 0) {
+        res.set({
+            'Cache-Control': 'public, max-age=300',
+            'X-Content-Type-Options': 'nosniff'
+        });
+        return res.type(imageData.contentType).send(imageData.buffer);
+    }
+
+    const imageUrl = getNewsImageUrl(news, getPublicSiteUrl());
+    return res.redirect(302, imageUrl);
 });
 
 app.listen(PORT, '0.0.0.0', () => {

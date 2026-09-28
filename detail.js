@@ -15,6 +15,23 @@ function getApiNewsEndpoint() {
 }
 
 const API_NEWS_ENDPOINT = getApiNewsEndpoint();
+const NEWS_SHARE_BASE_URL = API_NEWS_ENDPOINT.replace(/\/api\/news$/, '');
+
+function getNewsShareUrl(id) {
+    return `${NEWS_SHARE_BASE_URL}/api/news-share?id=${encodeURIComponent(String(id))}`;
+}
+
+function getNewsShareImageUrl(news) {
+    if (String(news.image || '').startsWith('data:image/')) {
+        return `${NEWS_SHARE_BASE_URL}/api/news-image?id=${encodeURIComponent(String(news.id))}`;
+    }
+
+    try {
+        return new URL(news.image || 'images/logo.png', `${NEWS_SHARE_BASE_URL}/`).href;
+    } catch (error) {
+        return `${NEWS_SHARE_BASE_URL}/images/logo.png`;
+    }
+}
 
 function isAdminPostedNews(item) {
     if (!item || typeof item !== 'object') return false;
@@ -144,6 +161,8 @@ function displayNewsDetail(news) {
 
     const categoryName = categoryMap[news.category] || news.category;
     const imageUrl = news.image || 'https://via.placeholder.com/800x400?text=No+Image';
+    const shareUrl = getNewsShareUrl(news.id);
+    const shareImageUrl = getNewsShareImageUrl(news);
     const bengaliDate = new Date(news.date).toLocaleDateString('bn-BD', {
         weekday: 'long',
         year: 'numeric',
@@ -157,13 +176,13 @@ function displayNewsDetail(news) {
     // Update Open Graph meta tags
     updateMetaTag('og:title', news.title);
     updateMetaTag('og:description', news.description.substring(0, 160));
-    updateMetaTag('og:image', imageUrl);
-    updateMetaTag('og:url', window.location.href);
+    updateMetaTag('og:image', shareImageUrl);
+    updateMetaTag('og:url', shareUrl);
     
     // Update Twitter Card meta tags
     updateMetaTag('twitter:title', news.title);
     updateMetaTag('twitter:description', news.description.substring(0, 160));
-    updateMetaTag('twitter:image', imageUrl);
+    updateMetaTag('twitter:image', shareImageUrl);
 
     const detailHtml = `
         <div class="detail-header">
@@ -179,6 +198,7 @@ function displayNewsDetail(news) {
 
         <div class="detail-image-wrapper">
             <img src="${imageUrl}" alt="${news.title}" class="detail-image">
+            <img src="images/logo.png" alt="M TV" class="detail-image-logo">
         </div>
 
         <div class="detail-body">
@@ -187,16 +207,16 @@ function displayNewsDetail(news) {
         
         <div class="share-buttons">
             <h3>শেয়ার করুন:</h3>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn share-facebook" title="Facebook এ শেয়ার করুন">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" class="share-btn share-facebook" title="Facebook এ শেয়ার করুন">
                 <i class="fab fa-facebook"></i> Facebook
             </a>
-            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(news.title)}" target="_blank" class="share-btn share-twitter" title="Twitter এ শেয়ার করুন">
+            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(news.title)}" target="_blank" class="share-btn share-twitter" title="Twitter এ শেয়ার করুন">
                 <i class="fab fa-twitter"></i> Twitter
             </a>
-            <a href="https://wa.me/?text=${encodeURIComponent(news.title + ' ' + window.location.href)}" target="_blank" class="share-btn share-whatsapp" title="WhatsApp এ শেয়ার করুন">
+            <a href="https://wa.me/?text=${encodeURIComponent(news.title + ' ' + shareUrl)}" target="_blank" class="share-btn share-whatsapp" title="WhatsApp এ শেয়ার করুন">
                 <i class="fab fa-whatsapp"></i> WhatsApp
             </a>
-            <a href="mailto:?subject=${encodeURIComponent(news.title)}&body=${encodeURIComponent(news.description + '\n\n' + window.location.href)}" class="share-btn share-email" title="ইমেইল এ শেয়ার করুন">
+            <a href="mailto:?subject=${encodeURIComponent(news.title)}&body=${encodeURIComponent(news.description + '\n\n' + shareUrl)}" class="share-btn share-email" title="ইমেইল এ শেয়ার করুন">
                 <i class="fas fa-envelope"></i> ইমেইল
             </a>
         </div>

@@ -48,16 +48,16 @@ function displayNewsAsBanners(newsArray, containerId) {
         banner.innerHTML = `
             <div class="news-banner-media">
                 <img src="${imageUrl}" alt="${item.title}" class="news-banner-image">
-                <img src="images/logo.png" alt="M TV" class="news-banner-corner-logo">
+                <img src="images/logo.png" alt="M TV" class="news-banner-center-logo">
             </div>
             <div class="news-banner-caption">
+                <h3 class="news-banner-title">${item.title}</h3>
                 <div class="news-banner-meta">
                     <span class="news-banner-category">${categoryName}</span>
                     <span class="news-banner-date">Date: ${bengaliDate}</span>
                     <span class="news-banner-author">By: ${item.author || 'M TV'}</span>
                     <span class="channel-badge">M TV</span>
                 </div>
-                <h3 class="news-banner-title">${item.title}</h3>
             </div>
         `;
 
@@ -113,16 +113,16 @@ function displayFeaturedBanner(newsArray, containerId) {
     banner.innerHTML = `
         <div class="news-banner-media">
             <img src="${imageUrl}" alt="${featured.title}" class="news-banner-image">
-            <img src="images/logo.png" alt="M TV" class="news-banner-corner-logo">
+            <img src="images/logo.png" alt="M TV" class="news-banner-center-logo">
         </div>
         <div class="news-banner-caption">
+            <h2 class="news-banner-title">${featured.title}</h2>
             <div class="news-banner-meta">
                 <span class="news-banner-category">${categoryName}</span>
                 <span class="news-banner-date">Date: ${bengaliDate}</span>
                 <span class="news-banner-author">By: ${featured.author || 'M TV'}</span>
                 <span class="channel-badge">M TV</span>
             </div>
-            <h2 class="news-banner-title">${featured.title}</h2>
         </div>
     `;
 

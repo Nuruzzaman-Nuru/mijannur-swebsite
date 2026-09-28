@@ -17,13 +17,19 @@ function getApiNewsEndpoint() {
 const API_NEWS_ENDPOINT = getApiNewsEndpoint();
 const NEWS_SHARE_BASE_URL = API_NEWS_ENDPOINT.replace(/\/api\/news$/, '');
 
-function getNewsShareUrl(id) {
-    return `${NEWS_SHARE_BASE_URL}/api/news-share?id=${encodeURIComponent(String(id))}`;
+function getNewsShareUrl(news) {
+    const shareUrl = new URL(`${NEWS_SHARE_BASE_URL}/api/news-share`);
+    shareUrl.searchParams.set('id', String(news.id));
+    shareUrl.searchParams.set('v', String(news.updatedAt || news.createdAt || news.date || '1'));
+    return shareUrl.href;
 }
 
 function getNewsShareImageUrl(news) {
     if (String(news.image || '').startsWith('data:image/')) {
-        return `${NEWS_SHARE_BASE_URL}/api/news-image?id=${encodeURIComponent(String(news.id))}`;
+        const imageUrl = new URL(`${NEWS_SHARE_BASE_URL}/api/news-image`);
+        imageUrl.searchParams.set('id', String(news.id));
+        imageUrl.searchParams.set('v', String(news.updatedAt || news.createdAt || news.date || '1'));
+        return imageUrl.href;
     }
 
     try {
@@ -161,7 +167,7 @@ function displayNewsDetail(news) {
 
     const categoryName = categoryMap[news.category] || news.category;
     const imageUrl = news.image || 'https://via.placeholder.com/800x400?text=No+Image';
-    const shareUrl = getNewsShareUrl(news.id);
+    const shareUrl = getNewsShareUrl(news);
     const shareImageUrl = getNewsShareImageUrl(news);
     const bengaliDate = new Date(news.date).toLocaleDateString('bn-BD', {
         weekday: 'long',

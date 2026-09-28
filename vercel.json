@@ -6,7 +6,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": "[Ff]acebookexternalhit|[Ff]acebot|[Tt]witterbot|[Ww]hatsapp|[Ll]inkedinbot|[Tt]elegrambot|[Ss]lackbot|[Dd]iscordbot|[Pp]interest|[Ss]kypeuripreview"
+          "value": ".*([Ff]acebookexternalhit|[Ff]acebot|[Tt]witterbot|[Ww]hats[Aa]pp|[Ll]inkedinbot|[Tt]elegrambot|[Ss]lackbot|[Dd]iscordbot|[Pp]interest|[Ss]kypeuripreview).*"
         }
       ],
       "destination": "/api/news-share"

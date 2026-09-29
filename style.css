@@ -1265,6 +1265,7 @@ footer {
 .detail-image-logo {
     width: 32px;
     height: 32px;
+    display: none;
 }
 .news-banner-caption {
     width: 100%;
@@ -1486,7 +1487,7 @@ footer {
 .detail-image {
     width: 100%;
     height: auto;
-    max-height: 500px;
+    max-height: 320px;
     object-fit: cover;
     display: block;
     border-radius: 4px;
@@ -2087,6 +2088,7 @@ footer {
     }
 
     body:has(.news-detail) .detail-image-logo {
+        display: block !important;
         width: 64px !important;
         height: 64px !important;
         top: 100% !important;

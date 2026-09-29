@@ -35,25 +35,31 @@ function initializeDetailPrintPDF() {
 
     if (imageBtn) {
         imageBtn.addEventListener('click', async function() {
-            const imageUrl = imageBtn.dataset.imageUrl;
-            if (!imageUrl) return;
-
             imageBtn.disabled = true;
+            document.body.classList.add('exporting-print');
             try {
-                const response = await fetch(imageUrl, { cache: 'no-store' });
-                if (!response.ok) throw new Error('Could not download poster');
+                if (typeof window.html2canvas !== 'function') {
+                    throw new Error('PNG export library is unavailable');
+                }
 
-                const blobUrl = URL.createObjectURL(await response.blob());
+                await document.fonts.ready;
+                const canvas = await window.html2canvas(document.querySelector('.news-detail'), {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                const blobUrl = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = 'm-tv-news-poster.jpg';
+                link.download = 'm-tv-news-print.png';
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
-                URL.revokeObjectURL(blobUrl);
             } catch (error) {
-                window.open(imageUrl, '_blank', 'noopener');
+                console.error('Could not export news as PNG:', error);
             } finally {
+                document.body.classList.remove('exporting-print');
                 imageBtn.disabled = false;
             }
         });

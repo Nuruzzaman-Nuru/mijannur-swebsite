@@ -2152,6 +2152,76 @@ footer {
         widows: 3;
     }
 }
+
+/* Reuse the newspaper composition when exporting the detail page to PNG. */
+body.exporting-print .news-detail {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #111 !important;
+}
+
+body.exporting-print .detail-actions,
+body.exporting-print .detail-image-wrapper,
+body.exporting-print .share-buttons,
+body.exporting-print .detail-footer {
+    display: none !important;
+}
+
+body.exporting-print .print-masthead {
+    display: flex !important;
+    align-items: center;
+    gap: 5mm;
+    border-bottom: 2px solid #c90018;
+    margin: 0 0 5mm !important;
+    padding: 0 0 3mm !important;
+}
+
+body.exporting-print #detail-content {
+    display: block !important;
+}
+
+body.exporting-print .detail-header {
+    margin: 0 0 8mm !important;
+    text-align: center !important;
+}
+
+body.exporting-print .detail-title {
+    color: #111 !important;
+    font-size: 24pt !important;
+    line-height: 1.35 !important;
+    margin: 0 0 4mm !important;
+}
+
+body.exporting-print .detail-category {
+    color: #a60000 !important;
+    background: transparent !important;
+}
+
+body.exporting-print .detail-meta {
+    justify-content: center !important;
+    color: #444 !important;
+    font-size: 10pt !important;
+}
+
+body.exporting-print .detail-body {
+    margin: 0 !important;
+}
+
+body.exporting-print .detail-description {
+    color: #111 !important;
+    font-size: 9.5pt !important;
+    line-height: 1.45 !important;
+    text-align: justify !important;
+    column-count: 3;
+    column-gap: 6mm;
+    white-space: pre-line;
+}
+
 .footer{
     background:#111827;
     color:#fff;

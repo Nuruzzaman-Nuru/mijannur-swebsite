@@ -226,6 +226,8 @@ function displayNewsDetail(news) {
     `;
 
     document.getElementById('detail-content').innerHTML = detailHtml;
+    const imageDownloadButton = document.getElementById('download-detail-image-btn');
+    if (imageDownloadButton) imageDownloadButton.dataset.imageUrl = shareImageUrl;
 }
 
 // Function to update meta tags

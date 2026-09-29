@@ -37,6 +37,9 @@ function initializeDetailPrintPDF() {
         imageBtn.addEventListener('click', async function() {
             imageBtn.disabled = true;
             document.body.classList.add('exporting-print');
+            const imageWrapper = document.querySelector('.detail-image-wrapper');
+            const previousImageDisplay = imageWrapper ? imageWrapper.style.display : '';
+            if (imageWrapper) imageWrapper.style.setProperty('display', 'none', 'important');
             try {
                 if (typeof window.html2canvas !== 'function') {
                     throw new Error('PNG export library is unavailable');
@@ -59,6 +62,7 @@ function initializeDetailPrintPDF() {
             } catch (error) {
                 console.error('Could not export news as PNG:', error);
             } finally {
+                if (imageWrapper) imageWrapper.style.display = previousImageDisplay;
                 document.body.classList.remove('exporting-print');
                 imageBtn.disabled = false;
             }

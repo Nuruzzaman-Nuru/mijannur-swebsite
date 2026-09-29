@@ -2187,6 +2187,26 @@ body.exporting-print .print-masthead {
     padding: 0 0 3mm !important;
 }
 
+body.exporting-print .print-masthead strong {
+    display: block;
+    color: #c90018;
+    font-family: Georgia, serif;
+    font-size: 28pt;
+    line-height: 1;
+}
+
+body.exporting-print .print-masthead > div > span {
+    display: block;
+    color: #1c6b3a;
+    font-size: 10pt;
+    margin-top: 1mm;
+}
+
+body.exporting-print .print-site-line b {
+    color: #111;
+    font-size: 11pt;
+}
+
 body.exporting-print #detail-content {
     display: block !important;
 }

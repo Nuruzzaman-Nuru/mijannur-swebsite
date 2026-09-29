@@ -1490,6 +1490,12 @@ footer {
     display: none;
 }
 
+.print-masthead-logo {
+    width: 12mm;
+    height: 12mm;
+    object-fit: contain;
+}
+
 .detail-image {
     width: 100%;
     height: auto;

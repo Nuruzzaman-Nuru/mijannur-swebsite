@@ -1935,7 +1935,7 @@ footer {
 /* ===================== PRINT STYLES ===================== */
 @media print {
     @page {
-        margin: 10mm;
+        margin: 15mm;
     }
 
     * {
@@ -2020,11 +2020,23 @@ footer {
     }
 
     body:has(.news-detail) .print-masthead b {
-        display: block;
         color: #111;
         font-size: 11pt;
         letter-spacing: 0;
+    }
+
+    body:has(.news-detail) .print-site-line {
+        display: flex;
+        align-items: baseline;
+        gap: 4mm;
         margin-top: 2mm;
+    }
+
+    body:has(.news-detail) .print-site-line span {
+        display: inline;
+        color: #1c6b3a;
+        font-size: 10pt;
+        margin-top: 0;
     }
 
     body:has(.news-detail) main > .container {

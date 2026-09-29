@@ -2072,7 +2072,7 @@ footer {
     }
 
     body:has(.news-detail) .detail-image-wrapper {
-        display: block !important;
+        display: none !important;
         max-width: none !important;
         float: left;
         width: 34% !important;

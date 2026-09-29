@@ -1935,7 +1935,7 @@ footer {
 /* ===================== PRINT STYLES ===================== */
 @media print {
     @page {
-        margin: 15mm;
+        margin: 0;
     }
 
     * {
@@ -2043,7 +2043,7 @@ footer {
         width: 100% !important;
         max-width: none !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 15mm !important;
     }
 
     body:has(.news-detail) .detail-wrapper {

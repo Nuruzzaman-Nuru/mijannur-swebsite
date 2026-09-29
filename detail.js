@@ -21,6 +21,7 @@ function getNewsShareUrl(news) {
     const shareUrl = new URL(`${NEWS_SHARE_BASE_URL}/api/news-share`);
     shareUrl.searchParams.set('id', String(news.id));
     shareUrl.searchParams.set('v', String(news.updatedAt || news.createdAt || news.date || '1'));
+    shareUrl.searchParams.set('pv', '3');
     return shareUrl.href;
 }
 
@@ -28,6 +29,7 @@ function getNewsShareImageUrl(news) {
     const imageUrl = new URL(`${NEWS_SHARE_BASE_URL}/api/news-poster`);
     imageUrl.searchParams.set('id', String(news.id));
     imageUrl.searchParams.set('v', String(news.updatedAt || news.createdAt || news.date || '1'));
+    imageUrl.searchParams.set('pv', '3');
     return imageUrl.href;
 }
 

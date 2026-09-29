@@ -1989,6 +1989,44 @@ footer {
         display: none !important;
     }
 
+    body:has(.news-detail) .print-masthead {
+        display: flex !important;
+        align-items: center;
+        gap: 5mm;
+        border-bottom: 2px solid #c90018;
+        margin: 0 0 5mm !important;
+        padding: 0 0 3mm !important;
+    }
+
+    body:has(.news-detail) .print-masthead img {
+        width: 24mm !important;
+        height: 24mm !important;
+        object-fit: contain;
+    }
+
+    body:has(.news-detail) .print-masthead strong {
+        display: block;
+        color: #c90018;
+        font-family: Georgia, serif;
+        font-size: 28pt;
+        line-height: 1;
+    }
+
+    body:has(.news-detail) .print-masthead span {
+        display: block;
+        color: #1c6b3a;
+        font-size: 10pt;
+        margin-top: 1mm;
+    }
+
+    body:has(.news-detail) .print-masthead b {
+        display: block;
+        color: #111;
+        font-size: 11pt;
+        letter-spacing: 0;
+        margin-top: 2mm;
+    }
+
     body:has(.news-detail) main > .container {
         width: 100% !important;
         max-width: none !important;
@@ -2010,15 +2048,15 @@ footer {
     }
 
     body:has(.news-detail) #detail-content {
-        display: flex !important;
-        flex-direction: column !important;
+        display: block !important;
     }
 
     body:has(.news-detail) .detail-image-wrapper {
-        order: 0;
-        margin: 0 0 12mm !important;
+        float: left;
+        width: 34% !important;
+        margin: 0 5mm 3mm 0 !important;
         border: 3px solid #a60000 !important;
-        border-bottom-width: 30px !important;
+        border-bottom-width: 3px !important;
         border-radius: 0 !important;
         break-inside: avoid;
         page-break-inside: avoid;
@@ -2026,7 +2064,7 @@ footer {
 
     body:has(.news-detail) .detail-image {
         width: 100% !important;
-        max-height: 135mm !important;
+        max-height: 72mm !important;
         object-fit: contain !important;
         border-radius: 0 !important;
     }
@@ -2040,7 +2078,6 @@ footer {
     }
 
     body:has(.news-detail) .detail-header {
-        order: 1;
         margin: 0 0 8mm !important;
         text-align: center !important;
         break-after: avoid;
@@ -2069,14 +2106,16 @@ footer {
     }
 
     body:has(.news-detail) .detail-body {
-        order: 2;
         margin: 0 !important;
     }
 
     body:has(.news-detail) .detail-description {
         color: #111 !important;
-        font-size: 12pt !important;
-        line-height: 1.7 !important;
+        font-size: 9.5pt !important;
+        line-height: 1.45 !important;
+        text-align: justify !important;
+        column-count: 3;
+        column-gap: 6mm;
         white-space: pre-line;
         orphans: 3;
         widows: 3;

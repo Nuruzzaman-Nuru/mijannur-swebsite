@@ -1486,6 +1486,10 @@ footer {
     display: block;
 }
 
+.print-masthead {
+    display: none;
+}
+
 .detail-image {
     width: 100%;
     height: auto;

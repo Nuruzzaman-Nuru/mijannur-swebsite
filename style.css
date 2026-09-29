@@ -1482,6 +1482,7 @@ footer {
     margin: 2rem 0 3.5rem;
     border-radius: 8px;
     border: 4px solid #c00000;
+    display: none;
 }
 
 .detail-image {
@@ -2070,6 +2071,7 @@ footer {
     }
 
     body:has(.news-detail) .detail-image-wrapper {
+        display: none !important;
         float: left;
         width: 34% !important;
         margin: 0 5mm 3mm 0 !important;

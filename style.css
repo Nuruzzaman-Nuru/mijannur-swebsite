@@ -1999,8 +1999,8 @@ footer {
     }
 
     body:has(.news-detail) .print-masthead img {
-        width: 24mm !important;
-        height: 24mm !important;
+        width: 16mm !important;
+        height: 16mm !important;
         object-fit: contain;
     }
 

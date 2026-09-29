@@ -2117,6 +2117,10 @@ footer {
         font-size: 10pt !important;
     }
 
+    body:has(.news-detail) .detail-posted-by {
+        display: none !important;
+    }
+
     body:has(.news-detail) .detail-body {
         margin: 0 !important;
     }

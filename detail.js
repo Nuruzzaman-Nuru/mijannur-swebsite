@@ -190,7 +190,6 @@ function displayNewsDetail(news) {
             <div class="detail-meta">
                 <span class="detail-date">📅 ${bengaliDate}</span>
                 ${news.author ? `<span class="detail-author">✍️ ${news.author}</span>` : ''}
-                ${news.postedBy ? `<span class="detail-posted-by">👤 ${news.postedBy}</span>` : ''}
             </div>
         </div>
 

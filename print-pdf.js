@@ -106,7 +106,7 @@ function createNewspaperExportPage() {
         return element;
     };
     const header = make('header', 'newspaper-export-header');
-    header.style.cssText = 'display:grid;grid-template-columns:145px 1fr 270px;gap:18px;align-items:center;border-bottom:7px solid #176b32;padding:0 0 12px';
+    header.style.cssText = 'display:grid;grid-template-columns:145px 1fr 270px;gap:18px;align-items:center;background:#f4f8f2;border-top:3px solid #176b32;border-bottom:7px solid #176b32;padding:10px 12px 12px';
 
     const logo = make('img', 'newspaper-export-logo');
     logo.src = mastheadLogo ? mastheadLogo.src : 'images/logo.png';

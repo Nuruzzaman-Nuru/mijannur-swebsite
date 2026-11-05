@@ -28,8 +28,34 @@ function initializeDetailPrintPDF() {
     const imageBtn = document.getElementById('download-detail-image-btn');
     
     if (printBtn) {
-        printBtn.addEventListener('click', function() {
-            window.print();
+        printBtn.addEventListener('click', async function() {
+            printBtn.disabled = true;
+            printBtn.setAttribute('aria-busy', 'true');
+            let exportPage;
+            let printCleanupTimer;
+            const cleanup = () => {
+                window.clearTimeout(printCleanupTimer);
+                window.removeEventListener('afterprint', cleanup);
+                document.body.classList.remove('exporting-newspaper-print');
+                if (exportPage) exportPage.remove();
+                printBtn.removeAttribute('aria-busy');
+                printBtn.disabled = false;
+            };
+
+            try {
+                await document.fonts.ready;
+                exportPage = createNewspaperExportPage();
+                document.body.appendChild(exportPage);
+                await waitForExportImages(exportPage);
+                document.body.classList.add('exporting-newspaper-print');
+                window.addEventListener('afterprint', cleanup, { once: true });
+                printCleanupTimer = window.setTimeout(cleanup, 120000);
+                window.print();
+            } catch (error) {
+                console.error('Could not print news:', error);
+                cleanup();
+                window.alert('PDF তৈরি করা যায়নি। পেজটি আবার লোড করে চেষ্টা করুন।');
+            }
         });
     }
 
@@ -161,7 +187,7 @@ function createNewspaperExportPage() {
     bottomAd.append(bottomLabel, bottomCopy);
 
     const footer = make('footer', 'newspaper-export-footer');
-    footer.style.cssText = 'margin-top:17px;padding:11px 4px 0;border-top:4px solid #176b32;text-align:center;font-size:14px;line-height:1.7;color:#333';
+    footer.style.cssText = 'margin-top:17px;padding:11px 4px 0;border-top:4px solid #176b32;text-align:center;font-size:14px;line-height:1.7;color:#333;background:#fff';
     const footerName = make('strong', '', 'M TV প্রতিদিনের সংবাদ');
     const footerContact = make('div', '', 'সম্পাদকীয় ও বিজ্ঞাপন বিভাগ');
     const footerNote = make('div', '', 'সর্বস্বত্ব সংরক্ষিত © M TV');

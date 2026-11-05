@@ -87,7 +87,6 @@ function createNewspaperExportPage() {
     const image = detail && detail.querySelector('.detail-image');
     const description = detail && detail.querySelector('.detail-description');
     const meta = detail && detail.querySelector('.detail-meta');
-    const category = detail && detail.querySelector('.detail-category');
     const mastheadLogo = document.querySelector('.print-masthead-logo');
 
     if (!title || !description) throw new Error('News content is not ready for export');
@@ -136,9 +135,6 @@ function createNewspaperExportPage() {
 
     const headline = make('h1', 'newspaper-export-headline', title.innerText.trim());
     headline.style.cssText = 'font-size:32px;line-height:1.4;text-align:center;margin:20px 0 17px;padding:0 14px 13px;border-bottom:1px solid #ddd;color:#111';
-    const categoryText = make('div', 'newspaper-export-category', category ? `● ${category.innerText.trim()}` : 'সর্বশেষ সংবাদ');
-    categoryText.style.cssText = 'font-size:15px;font-weight:700;color:#176b32;margin-bottom:11px';
-
     const story = make('div', 'newspaper-export-story');
     story.style.cssText = 'display:grid;grid-template-columns:36% 1fr;gap:20px;align-items:start';
     const photoColumn = make('div', 'newspaper-export-photo-column');
@@ -170,7 +166,7 @@ function createNewspaperExportPage() {
     const footerContact = make('div', '', 'সম্পাদকীয় ও বিজ্ঞাপন বিভাগ');
     const footerNote = make('div', '', 'সর্বস্বত্ব সংরক্ষিত © M TV');
     footer.append(footerName, footerContact, footerNote);
-    page.append(header, categoryText, headline, story, bottomAd, footer);
+    page.append(header, headline, story, bottomAd, footer);
     return page;
 }
 

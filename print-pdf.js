@@ -115,11 +115,11 @@ function createNewspaperExportPage() {
     logo.style.cssText = 'width:112px;height:100px;object-fit:contain';
     const brand = make('div', 'newspaper-export-brand');
     brand.style.cssText = 'text-align:center';
-    const brandName = make('div', '', 'দৈনিক দক্ষিণের অপরাধ সংবাদ');
+    const brandName = make('div', '', 'M TV প্রতিদিনের সংবাদ');
     brandName.style.cssText = 'font-size:43px;font-weight:800;color:#126b32;line-height:1.3';
     const brandTagline = make('div', '', 'দেশ ও জনতার কথা');
     brandTagline.style.cssText = 'font-size:19px;font-weight:700;color:#7d1010;margin-top:2px';
-    const dateLine = make('div', 'newspaper-export-date', `${meta ? meta.innerText.replace(/\s+/g, ' ').trim() : ''}  |  mijannur-swebsite.vercel.app`);
+    const dateLine = make('div', 'newspaper-export-date', meta ? meta.innerText.replace(/\s+/g, ' ').trim() : 'সর্বশেষ সংবাদ');
     dateLine.style.cssText = 'font-size:15px;background:#176b32;color:#fff;text-align:center;padding:6px 10px;margin-top:12px';
     brand.append(brandName, brandTagline, dateLine);
 
@@ -166,9 +166,9 @@ function createNewspaperExportPage() {
 
     const footer = make('footer', 'newspaper-export-footer');
     footer.style.cssText = 'margin-top:17px;padding:11px 4px 0;border-top:4px solid #176b32;text-align:center;font-size:14px;line-height:1.7;color:#333';
-    const footerName = make('strong', '', 'দৈনিক দক্ষিণের অপরাধ সংবাদ');
-    const footerContact = make('div', '', 'সম্পাদকীয় ও বিজ্ঞাপন: mijannur-swebsite.vercel.app');
-    const footerNote = make('div', '', 'সর্বস্বত্ব সংরক্ষিত © দৈনিক দক্ষিণের অপরাধ সংবাদ');
+    const footerName = make('strong', '', 'M TV প্রতিদিনের সংবাদ');
+    const footerContact = make('div', '', 'সম্পাদকীয় ও বিজ্ঞাপন বিভাগ');
+    const footerNote = make('div', '', 'সর্বস্বত্ব সংরক্ষিত © M TV');
     footer.append(footerName, footerContact, footerNote);
     page.append(header, categoryText, headline, story, bottomAd, footer);
     return page;

@@ -186,7 +186,7 @@ function createNewspaperExportPage() {
     const bottomCopy = make('span', '', 'আপনার ব্যবসা ও প্রতিষ্ঠানের বিজ্ঞাপন প্রকাশে যোগাযোগ করুন');
     bottomAd.append(bottomLabel, bottomCopy);
 
-    const footer = make('footer', 'newspaper-export-footer');
+    const footer = make('div', 'newspaper-export-footer');
     footer.style.cssText = 'margin-top:17px;padding:11px 4px 0;border-top:4px solid #176b32;text-align:center;font-size:14px;line-height:1.7;color:#333;background-color:#e8efe8 !important';
     const footerName = make('strong', '', 'M TV প্রতিদিনের সংবাদ');
     const footerContact = make('div', '', 'সম্পাদকীয় ও বিজ্ঞাপন বিভাগ');

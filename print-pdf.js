@@ -107,16 +107,16 @@ function createNewspaperExportPage() {
         return element;
     };
     const header = make('header', 'newspaper-export-header');
-    header.style.cssText = 'display:grid;grid-template-columns:120px 1fr 270px;gap:18px;align-items:center;border-bottom:7px solid #176b32;padding:0 0 12px';
+    header.style.cssText = 'display:grid;grid-template-columns:145px 1fr 270px;gap:18px;align-items:center;border-bottom:7px solid #176b32;padding:0 0 12px';
 
     const logo = make('img', 'newspaper-export-logo');
     logo.src = mastheadLogo ? mastheadLogo.src : 'images/logo.png';
     logo.alt = 'সংবাদপত্রের লোগো';
-    logo.style.cssText = 'width:112px;height:100px;object-fit:contain';
+    logo.style.cssText = 'width:136px;height:120px;object-fit:contain';
     const brand = make('div', 'newspaper-export-brand');
     brand.style.cssText = 'text-align:center';
     const brandName = make('div', '', 'M TV প্রতিদিনের সংবাদ');
-    brandName.style.cssText = 'font-size:43px;font-weight:800;color:#126b32;line-height:1.3';
+    brandName.style.cssText = 'font-size:43px;font-weight:800;color:#126b32;line-height:1.3;margin-top:10px';
     const brandTagline = make('div', '', 'দেশ ও জনতার কথা');
     brandTagline.style.cssText = 'font-size:19px;font-weight:700;color:#7d1010;margin-top:2px';
     const dateLine = make('div', 'newspaper-export-date', meta ? meta.innerText.replace(/\s+/g, ' ').trim() : 'সর্বশেষ সংবাদ');

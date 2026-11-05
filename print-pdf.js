@@ -132,7 +132,7 @@ function createNewspaperExportPage() {
         return element;
     };
     const header = make('header', 'newspaper-export-header');
-    header.style.cssText = 'display:grid;grid-template-columns:145px 1fr 270px;gap:18px;align-items:center;background-color:#183b45 !important;border-top:3px solid #c6a653;border-bottom:7px solid #c6a653;padding:10px 12px 12px';
+    header.style.cssText = 'display:grid;grid-template-columns:145px 1fr 270px;gap:18px;align-items:center;background-color:#f4f8f2 !important;border-top:3px solid #176b32;border-bottom:7px solid #176b32;padding:10px 12px 12px';
 
     const logo = make('img', 'newspaper-export-logo');
     logo.src = mastheadLogo ? mastheadLogo.src : 'images/logo.png';
@@ -141,9 +141,9 @@ function createNewspaperExportPage() {
     const brand = make('div', 'newspaper-export-brand');
     brand.style.cssText = 'text-align:center';
     const brandName = make('div', '', 'M TV প্রতিদিনের সংবাদ');
-    brandName.style.cssText = 'font-size:43px;font-weight:800;color:#fff;line-height:1.3;margin-top:10px';
+    brandName.style.cssText = 'font-size:43px;font-weight:800;color:#126b32;line-height:1.3;margin-top:10px';
     const brandTagline = make('div', '', 'দেশ ও জনতার কথা');
-    brandTagline.style.cssText = 'font-size:19px;font-weight:700;color:#f4d58a;margin-top:2px';
+    brandTagline.style.cssText = 'font-size:19px;font-weight:700;color:#7d1010;margin-top:2px';
     const dateLine = make('div', 'newspaper-export-date', meta ? meta.innerText.replace(/\s+/g, ' ').trim() : 'সর্বশেষ সংবাদ');
     dateLine.style.cssText = 'font-size:15px;background:#176b32;color:#fff;text-align:center;padding:6px 10px;margin-top:12px';
     brand.append(brandName, brandTagline, dateLine);
@@ -187,7 +187,7 @@ function createNewspaperExportPage() {
     bottomAd.append(bottomLabel, bottomCopy);
 
     const footer = make('footer', 'newspaper-export-footer');
-    footer.style.cssText = 'margin-top:17px;padding:11px 4px 0;border-top:4px solid #176b32;text-align:center;font-size:14px;line-height:1.7;color:#333;background:#fff';
+    footer.style.cssText = 'margin-top:17px;padding:11px 4px 0;border-top:4px solid #176b32;text-align:center;font-size:14px;line-height:1.7;color:#333;background-color:#e8efe8 !important';
     const footerName = make('strong', '', 'M TV প্রতিদিনের সংবাদ');
     const footerContact = make('div', '', 'সম্পাদকীয় ও বিজ্ঞাপন বিভাগ');
     const footerNote = make('div', '', 'সর্বস্বত্ব সংরক্ষিত © M TV');

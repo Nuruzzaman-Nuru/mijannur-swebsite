@@ -387,12 +387,13 @@ main {
 
 /* Featured News Section */
 main.home-page-main > .container {
+    width: min(96vw, 1760px);
     max-width: 1760px;
 }
 
 .featured-news-layout {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(250px, 0.9fr);
+    grid-template-columns: minmax(0, 1.5fr) minmax(420px, 1fr);
     gap: 1.5rem;
     align-items: start;
     margin-bottom: 2rem;
@@ -415,7 +416,8 @@ main.home-page-main > .container {
 }
 
 .featured-sidebar-ad-image {
-    max-height: 400px;
+    width: 100%;
+    max-height: none;
 }
 
 .featured-news-item {

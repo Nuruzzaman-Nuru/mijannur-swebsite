@@ -501,6 +501,30 @@ main.home-page-main > .container {
     object-fit: contain;
 }
 
+.advertising-contact-panel {
+    padding: 1.5rem;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    text-align: center;
+}
+
+.advertising-contact-panel p {
+    margin-bottom: 0.6rem;
+}
+
+.advertising-contact-panel .contact-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.advertising-contact-panel a {
+    color: #fff;
+    text-decoration: underline;
+}
+
 .popular-news-item {
     display: flex;
     gap: 1rem;

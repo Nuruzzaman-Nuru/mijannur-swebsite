@@ -172,7 +172,9 @@
 
     async function refreshTicker() {
         const apiNews = await loadFromApi();
-        const sourceNews = Array.isArray(apiNews) ? apiNews : await loadFromJson();
+        const sourceNews = Array.isArray(apiNews) && apiNews.length > 0
+            ? apiNews
+            : await loadFromJson();
         const recent = getRecentHeadlines(sourceNews);
         renderHeadlines(recent);
     }

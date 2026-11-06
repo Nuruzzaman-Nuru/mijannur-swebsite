@@ -107,7 +107,9 @@ async function loadNewsFromJsonFile() {
 async function loadNewsDetail() {
     try {
         const apiNews = await loadNewsFromApi();
-        const allNews = Array.isArray(apiNews) ? apiNews : await loadNewsFromJsonFile();
+        const allNews = Array.isArray(apiNews) && apiNews.length > 0
+            ? apiNews
+            : await loadNewsFromJsonFile();
         
         // Load user news
         const parsedUserNews = JSON.parse(localStorage.getItem('userNews')) || [];

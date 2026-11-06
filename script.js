@@ -162,7 +162,7 @@ async function loadNews() {
         const apiNews = await loadNewsFromApi();
         const localNews = getAdminOnlyNews(getParsedUserNews());
 
-        if (Array.isArray(apiNews)) {
+        if (Array.isArray(apiNews) && apiNews.length > 0) {
             allNews = getAdminOnlyNews(apiNews);
             userNews = localNews;
         } else {

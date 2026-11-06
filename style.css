@@ -499,8 +499,12 @@ main.home-page-main > .container {
 .sidebar-ad-image {
     display: block;
     width: 100%;
-    max-height: 360px;
+    height: auto;
     object-fit: contain;
+}
+
+.sidebar-widget:has(.sidebar-ad-image) .sidebar-content {
+    padding: 0;
 }
 
 .advertising-contact-panel {
@@ -630,10 +634,6 @@ main.home-page-main > .container {
 }
 
 @media (max-width: 768px) {
-    .sidebar-ad-image {
-        max-height: 280px;
-    }
-
     .advertising-contact-panel {
         align-items: flex-start;
         flex-direction: column;
@@ -1661,14 +1661,13 @@ footer {
 }
 
 .advertisement-section {
-    padding-bottom: 0.75rem;
+    padding-bottom: 0;
 }
 
 .advertisement-image {
     display: block;
-    width: calc(100% - 1.5rem);
-    max-height: 220px;
-    margin: 0.75rem auto 0;
+    width: 100%;
+    height: auto;
     object-fit: contain;
 }
 

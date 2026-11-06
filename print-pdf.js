@@ -149,14 +149,12 @@ function createNewspaperExportPage() {
     brand.append(brandName, brandTagline, dateLine);
 
     const topAd = make('div', 'newspaper-export-ad newspaper-export-ad-top');
-    topAd.style.cssText = 'height:92px;border:2px solid #d5a521;background:#fff8d9;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#542d13;padding:8px;box-sizing:border-box';
-    const adLabel = make('small', '', 'বিজ্ঞাপন');
-    adLabel.style.cssText = 'color:#8b6a14;font-size:13px';
-    const adTitle = make('strong', '', 'আপনার প্রতিষ্ঠানের প্রচারে');
-    adTitle.style.cssText = 'font-size:19px';
-    const adText = make('span', '', 'এখানে বিজ্ঞাপন দিন');
-    adText.style.cssText = 'font-size:16px';
-    topAd.append(adLabel, adTitle, adText);
+    topAd.style.cssText = 'width:270px;display:flex;align-items:center;justify-content:center;box-sizing:border-box';
+    const adImage = make('img', 'newspaper-export-ad-image');
+    adImage.src = 'images/mijanur%20ads.png';
+    adImage.alt = 'মিজানুর রহমান মেটাল বিজ্ঞাপন';
+    adImage.style.cssText = 'display:block;width:100%;height:auto;max-height:170px;object-fit:contain';
+    topAd.appendChild(adImage);
     header.append(logo, brand, topAd);
 
     const headline = make('h1', 'newspaper-export-headline', title.innerText.trim());

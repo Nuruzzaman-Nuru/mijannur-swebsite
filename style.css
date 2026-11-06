@@ -1540,6 +1540,18 @@ footer {
     gap: 1.5rem;
 }
 
+.advertisement-section {
+    padding-bottom: 0.75rem;
+}
+
+.advertisement-image {
+    display: block;
+    width: calc(100% - 1.5rem);
+    max-height: 220px;
+    margin: 0.75rem auto 0;
+    object-fit: contain;
+}
+
 .sidebar-section {
     background: white;
     border-radius: 8px;
